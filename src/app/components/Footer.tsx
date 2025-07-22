@@ -17,7 +17,9 @@ const Footer: React.FC<FooterProps> = ({ empresa }) => {
     email, 
     whatsapp, 
     cor_primaria, 
-    cor_secundaria 
+    cor_secundaria, 
+    horario_atendimento, 
+    sobre_nos 
   } = empresa;
 
   return (
@@ -33,8 +35,8 @@ const Footer: React.FC<FooterProps> = ({ empresa }) => {
           {/* About Column */}
           <div>
             <h3 className="text-lg font-bold mb-4">Sobre Nós</h3>
-            <p className="text-sm opacity-90">
-              {descricao || 'Sua descrição de negócio aqui.'}
+            <p className="text-sm opacity-90 whitespace-pre-line">
+              {sobre_nos || descricao || 'Sua descrição de negócio aqui.'}
             </p>
           </div>
           
@@ -92,20 +94,24 @@ const Footer: React.FC<FooterProps> = ({ empresa }) => {
           {/* Business Hours Column */}
           <div>
             <h3 className="text-lg font-bold mb-4">Horário de Atendimento</h3>
-            <ul className="space-y-2">
-              <li className="flex justify-between">
-                <span className="text-sm opacity-90">Segunda a Sexta:</span>
-                <span className="text-sm opacity-90">09:00 - 18:00</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-sm opacity-90">Sábado:</span>
-                <span className="text-sm opacity-90">09:00 - 12:00</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-sm opacity-90">Domingo:</span>
-                <span className="text-sm opacity-90">Fechado</span>
-              </li>
-            </ul>
+            {horario_atendimento ? (
+              <pre className="text-sm opacity-90 whitespace-pre-line">{horario_atendimento}</pre>
+            ) : (
+              <ul className="space-y-2">
+                <li className="flex justify-between">
+                  <span className="text-sm opacity-90">Segunda a Sexta:</span>
+                  <span className="text-sm opacity-90">09:00 - 18:00</span>
+                </li>
+                <li className="flex justify-between">
+                  <span className="text-sm opacity-90">Sábado:</span>
+                  <span className="text-sm opacity-90">09:00 - 12:00</span>
+                </li>
+                <li className="flex justify-between">
+                  <span className="text-sm opacity-90">Domingo:</span>
+                  <span className="text-sm opacity-90">Fechado</span>
+                </li>
+              </ul>
+            )}
           </div>
         </div>
         

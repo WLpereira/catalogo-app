@@ -14,6 +14,7 @@ export default function EmpresaPage() {
   const [empresa, setEmpresa] = useState<Empresa | null>(null);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const { searchQuery: busca, setSearchQuery: setBusca } = useSearch();
+  const [buscaLocal, setBuscaLocal] = useState(busca);
   const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(null);
   const [quantidade, setQuantidade] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -67,30 +68,22 @@ export default function EmpresaPage() {
         </div>
       ) : empresa ? (
         <>
-          <header className="bg-transparent py-6 px-4 sm:px-6 lg:px-8 flex justify-center w-full">
-            <div className="flex items-center space-x-4 bg-white/80 rounded-xl shadow-lg px-6 py-3 max-w-3xl w-full">
+          <header className="w-full bg-transparent flex flex-col items-center py-4 px-2 sm:px-4 lg:px-8">
+            <div className="flex flex-col sm:flex-row items-center gap-3 bg-white/80 rounded-xl shadow-lg px-4 py-3 max-w-xl w-full">
               {empresa.logo_url && (
                 <img
                   src={empresa.logo_url}
                   alt={`Logo ${empresa.nome}`}
-                  className="h-14 w-14 object-contain rounded-full border border-gray-200 shadow"
+                  className="h-12 w-12 sm:h-14 sm:w-14 object-contain rounded-full border border-gray-200 shadow"
                 />
               )}
-              <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: corPrimaria }}>{empresa.nome}</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-center w-full" style={{ color: corPrimaria }}>{empresa.nome}</h1>
             </div>
           </header>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center space-x-4">
-            {empresa.logo_url && (
-              <img
-                src={empresa.logo_url}
-                alt={`Logo ${empresa.nome}`}
-                className="h-12 w-auto object-contain"
-              />
-            )}
-          </div>
+          {/* Banner responsivo */}
           {empresa.banner_urls && empresa.banner_urls.length > 0 && (
-            <div className="w-full h-48 md:h-64 overflow-hidden">
-              <div className="w-full h-48 md:h-64 rounded-xl overflow-hidden shadow-xl mb-6 border-4 border-white/80">
+            <div className="w-full flex justify-center mt-4">
+              <div className="w-full max-w-5xl h-32 sm:h-44 md:h-56 rounded-xl overflow-hidden shadow-xl mb-6 border-4 border-white/80 flex justify-center items-center bg-white/10">
                 <img
                   src={empresa.banner_urls[0]}
                   alt="Banner da loja"
@@ -99,13 +92,17 @@ export default function EmpresaPage() {
               </div>
             </div>
           )}
-          <div className="flex justify-center w-full mb-8">
+          {/* Barra de pesquisa responsiva */}
+          <div className="w-full flex justify-center mt-2 mb-8 px-2">
             <div className="relative w-full max-w-xl">
               <input
                 type="text"
                 placeholder="Buscar produtos..."
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
+                value={buscaLocal}
+                onChange={(e) => {
+                  setBuscaLocal(e.target.value);
+                  setBusca(e.target.value);
+                }}
                 className="w-full px-6 py-3 rounded-full shadow focus:outline-none focus:ring-2 focus:ring-offset-2"
                 style={{
                   border: `2px solid ${corSecundaria}`,
@@ -124,11 +121,11 @@ export default function EmpresaPage() {
           <main className="flex-1 w-full py-10 px-2 sm:px-4">
             <div className="max-w-7xl mx-auto">
               <h2 className="text-2xl font-bold mb-8 text-center tracking-tight" style={{ color: corSecundaria, letterSpacing: 1 }}>Produtos Disponíveis</h2>
-              {produtos.length === 0 ? (
+              {produtosFiltrados.length === 0 ? (
                 <p className="text-center text-gray-100/80 text-lg font-medium">Nenhum produto encontrado.</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
-                  {produtos.map((produto) => (
+                  {produtosFiltrados.map((produto) => (
                     <div
                       key={produto.id}
                       className="bg-white/95 rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300 cursor-pointer flex flex-col h-full border-2 border-transparent hover:border-blue-200"

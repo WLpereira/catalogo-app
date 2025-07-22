@@ -1,4 +1,6 @@
 export interface Empresa {
+  horario_atendimento?: string;
+  sobre_nos?: string;
   id: string;
   nome: string;
   cnpj?: string;

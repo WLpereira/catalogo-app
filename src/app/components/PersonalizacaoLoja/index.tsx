@@ -111,14 +111,14 @@ export default function PersonalizacaoLoja({ empresaId, onClose }: Personalizaca
 
   return (
     <div className="bg-white rounded-lg p-6 max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Personalizar Loja</h2>
+      <h2 className="text-2xl font-bold mb-6 text-black">Personalizar Loja</h2>
       
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-semibold mb-3">Cores da Loja</h3>
+          <h3 className="text-lg font-semibold mb-3 text-black">Cores da Loja</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-black mb-1">
                 Cor Primária
               </label>
               <div className="flex items-center">
@@ -128,11 +128,11 @@ export default function PersonalizacaoLoja({ empresaId, onClose }: Personalizaca
                   onChange={(e) => setCorPrimaria(e.target.value)}
                   className="h-10 w-16 rounded border border-gray-300"
                 />
-                <span className="ml-2 text-sm text-gray-500">{corPrimaria}</span>
+                <span className="ml-2 text-sm text-gray-800">{corPrimaria}</span>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-black mb-1">
                 Cor Secundária
               </label>
               <div className="flex items-center">
@@ -142,39 +142,35 @@ export default function PersonalizacaoLoja({ empresaId, onClose }: Personalizaca
                   onChange={(e) => setCorSecundaria(e.target.value)}
                   className="h-10 w-16 rounded border border-gray-300"
                 />
-                <span className="ml-2 text-sm text-gray-500">{corSecundaria}</span>
+                <span className="ml-2 text-sm text-gray-800">{corSecundaria}</span>
               </div>
             </div>
           </div>
         </div>
         
         <div>
-          <h3 className="text-lg font-semibold mb-3">Banner da Loja</h3>
+          <h3 className="text-lg font-semibold mb-3 text-black">Banner da Loja</h3>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-black mb-2">
               Adicionar Imagens do Banner
             </label>
             <input
               type="file"
               accept="image/*"
-              multiple
               onChange={handleBannerChange}
-              className="block w-full text-sm text-gray-500
+              className="block w-full text-sm text-gray-800
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-md file:border-0
                 file:text-sm file:font-semibold
                 file:bg-blue-50 file:text-blue-700
                 hover:file:bg-blue-100"
             />
-            <p className="mt-1 text-xs text-gray-500">
-              Adicione até 5 imagens para o carrossel do banner.
-            </p>
           </div>
           
           {/* Pré-visualização dos banners */}
           {bannerPreviews.length > 0 && (
             <div className="mt-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">
+              <h4 className="text-sm font-medium text-black mb-2">
                 Pré-visualização dos Banners
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -205,7 +201,7 @@ export default function PersonalizacaoLoja({ empresaId, onClose }: Personalizaca
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-black bg-white hover:bg-gray-50"
           >
             Cancelar
           </button>

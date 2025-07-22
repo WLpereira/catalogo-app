@@ -16,6 +16,8 @@ export default function CadastroEmpresa() {
   const [senhaPrincipal, setSenhaPrincipal] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [loading, setLoading] = useState(false);
+  const [horarioAtendimento, setHorarioAtendimento] = useState("");
+  const [sobreNos, setSobreNos] = useState("");
   const [usuarioExtra1, setUsuarioExtra1] = useState("");
   const [usuarioExtra2, setUsuarioExtra2] = useState("");
   const [usuarioExtra3, setUsuarioExtra3] = useState("");
@@ -54,6 +56,8 @@ export default function CadastroEmpresa() {
         telefone,
         whatsapp,
         logo_url: logoUrl,
+        horario_atendimento: horarioAtendimento,
+        sobre_nos: sobreNos,
         usuario_principal: usuarioPrincipal,
         senha_principal: senhaPrincipal
       }
@@ -94,15 +98,34 @@ export default function CadastroEmpresa() {
             <label className="block text-sm font-semibold text-gray-700 mb-1">Nome da Empresa</label>
             <input 
               type="text" 
-              className="w-full p-3 border-2 rounded-lg focus:ring-2 text-black placeholder-gray-400"
-              style={{borderColor: '#4FC3F7', boxShadow: '0 2px 8px rgba(0,0,0,0.04)'}}
+              className="w-full p-3 border-2 rounded-lg focus:ring-2 text-black placeholder-gray-400 border-blue-400"
               placeholder="Digite o nome da sua empresa" 
               value={nome} 
-              onChange={e => setNome(e.target.value)} 
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNome(e.target.value)} 
               required 
             />
           </div>
-          
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Horário de Atendimento</label>
+            <textarea 
+              className="w-full p-3 border-2 rounded-lg focus:ring-2 text-black placeholder-gray-400 border-blue-400"
+              placeholder="Ex: Seg a Sex: 09:00 - 18:00\nSábado: 09:00 - 12:00\nDomingo: Fechado"
+              value={horarioAtendimento}
+              onChange={e => setHorarioAtendimento(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Sobre Nós</label>
+            <textarea 
+              className="w-full p-3 border-2 rounded-lg focus:ring-2 text-black placeholder-gray-400"
+              style={{borderColor: '#4FC3F7', boxShadow: '0 2px 8px rgba(0,0,0,0.04)'}}
+              placeholder="Conte um pouco sobre sua empresa, missão, valores, etc."
+              value={sobreNos}
+              onChange={e => setSobreNos(e.target.value)}
+              rows={3}
+            />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">CNPJ</label>
@@ -327,4 +350,4 @@ export default function CadastroEmpresa() {
       </div>
     </div>
   );
-} 
+}

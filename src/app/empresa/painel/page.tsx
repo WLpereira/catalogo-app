@@ -57,6 +57,8 @@ export default function PainelEmpresa() {
   const [empresaWhatsapp, setEmpresaWhatsapp] = useState("");
   const [empresaLogoFile, setEmpresaLogoFile] = useState<File | null>(null);
   const [empresaLogoUrl, setEmpresaLogoUrl] = useState("");
+  const [empresaHorario, setEmpresaHorario] = useState("");
+  const [empresaSobre, setEmpresaSobre] = useState("");
   const [usuarioExtra1, setUsuarioExtra1] = useState("");
   const [usuarioExtra2, setUsuarioExtra2] = useState("");
   const [usuarioExtra3, setUsuarioExtra3] = useState("");
@@ -153,6 +155,8 @@ export default function PainelEmpresa() {
     setEmpresaWhatsapp(empresa.whatsapp || "");
     setEmpresaLogoUrl(empresa.logo_url || "");
     setEmpresaLogoFile(null);
+    setEmpresaHorario(empresa.horario_atendimento || "");
+    setEmpresaSobre(empresa.sobre_nos || "");
     setUsuarioExtra1(empresa.usuario_extra1 || "");
     setUsuarioExtra2(empresa.usuario_extra2 || "");
     setUsuarioExtra3(empresa.usuario_extra3 || "");
@@ -195,6 +199,8 @@ export default function PainelEmpresa() {
       endereco: empresaEndereco,
       whatsapp: empresaWhatsapp,
       logo_url: logoUrl,
+      horario_atendimento: empresaHorario,
+      sobre_nos: empresaSobre,
       usuario_extra1: usuarioExtra1 || null,
       usuario_extra2: usuarioExtra2 || null,
       usuario_extra3: usuarioExtra3 || null,
@@ -320,28 +326,28 @@ export default function PainelEmpresa() {
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-2xl shadow-2xl w-full p-6 md:p-8 border border-[#B3E5FC] mb-8">
           <h1 className="text-3xl font-extrabold mb-6 text-center text-black tracking-tight">Painel da Empresa</h1>
-          <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 mb-8">
             {empresa.logo_url && (
-              <img src={empresa.logo_url} alt="Logo da empresa" className="w-32 h-32 object-contain rounded-xl border-2 border-[#4FC3F7] bg-gray-100" />
+              <img src={empresa.logo_url} alt="Logo da empresa" className="w-24 h-24 sm:w-32 sm:h-32 object-contain rounded-xl border-2 border-[#4FC3F7] bg-gray-100 mx-auto sm:mx-0" />
             )}
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-2xl font-bold text-gray-900">Painel da Empresa</h1>
-              <div className="flex space-x-4">
+            <div className="flex flex-col flex-1 w-full">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 text-center sm:text-left">Painel da Empresa</h1>
                 <button
                   onClick={() => setMostrarPersonalizacao(true)}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full sm:w-auto"
                 >
                   Personalizar Loja
                 </button>
               </div>
-            </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-[#039BE5] mb-2">Bem-vindo, {empresa.nome}!</h2>
-              <p className="text-base text-gray-700 mb-1"><b>CNPJ:</b> {empresa.cnpj}</p>
-              <p className="text-base text-gray-700 mb-1"><b>E-mail:</b> {empresa.email}</p>
-              <p className="text-base text-gray-700 mb-1"><b>Telefone:</b> {empresa.telefone}</p>
+              <h2 className="text-lg sm:text-2xl font-bold text-[#039BE5] mb-2 text-center sm:text-left">Bem-vindo, {empresa.nome}!</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                <p className="text-base text-gray-700"><b>CNPJ:</b> {empresa.cnpj}</p>
+                <p className="text-base text-gray-700"><b>E-mail:</b> {empresa.email}</p>
+                <p className="text-base text-gray-700"><b>Telefone:</b> {empresa.telefone}</p>
+              </div>
               <button
-                className="mt-2 bg-[#4FC3F7] hover:bg-[#039BE5] text-white px-4 py-2 rounded font-bold text-sm transition-all duration-200 border border-[#29B6F6]"
+                className="mt-2 bg-[#4FC3F7] hover:bg-[#039BE5] text-white px-4 py-2 rounded font-bold text-sm transition-all duration-200 border border-[#29B6F6] w-full sm:w-auto"
                 onClick={abrirModalEditarEmpresa}
               >
                 Editar empresa
@@ -388,27 +394,27 @@ export default function PainelEmpresa() {
             {mensagem && <p className="mt-2 text-center text-[#039BE5] font-semibold">{mensagem}</p>}
           </form>
           <h3 className="text-xl font-bold text-[#039BE5] mb-4">Produtos Cadastrados</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {produtos.length === 0 && <p className="text-gray-500 col-span-2">Nenhum produto cadastrado ainda.</p>}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {produtos.length === 0 && <p className="text-gray-500 col-span-full">Nenhum produto cadastrado ainda.</p>}
             {produtos.map((produto) => (
-              <div key={produto.id} className="bg-white border-2 border-[#B3E5FC] rounded-xl shadow p-4 flex flex-col items-center">
+              <div key={produto.id} className="bg-white border-2 border-[#B3E5FC] rounded-xl shadow p-3 sm:p-4 flex flex-col items-center">
                 {produto.imagem_url && (
-                  <img src={produto.imagem_url} alt={produto.nome} className="w-24 h-24 object-contain mb-2 rounded" />
+                  <img src={produto.imagem_url} alt={produto.nome} className="w-20 h-20 sm:w-24 sm:h-24 object-contain mb-2 rounded" />
                 )}
-                <h4 className="text-lg font-bold text-[#039BE5] mb-1">{produto.nome}</h4>
-                <p className="text-[#4FC3F7] font-bold mb-1">R$ {produto.preco?.toFixed(2)}</p>
-                <p className="text-gray-700 text-sm mb-1 text-center">{produto.descricao}</p>
+                <h4 className="text-base sm:text-lg font-bold text-[#039BE5] mb-1 text-center break-words">{produto.nome}</h4>
+                <p className="text-[#4FC3F7] font-bold mb-1 text-center">R$ {produto.preco?.toFixed(2)}</p>
+                <p className="text-gray-700 text-xs sm:text-sm mb-1 text-center break-words">{produto.descricao}</p>
                 <span className="text-xs text-gray-400">{new Date(produto.created_at).toLocaleString()}</span>
-                <div className="flex gap-2 mt-2">
+                <div className="flex flex-col sm:flex-row gap-2 mt-2 w-full justify-center">
                   <button
-                    className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-bold transition-all duration-200"
+                    className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded text-xs sm:text-sm font-bold transition-all duration-200 w-full sm:w-auto"
                     onClick={() => handleExcluirProduto(produto.id)}
                     disabled={loadingProduto}
                   >
                     Excluir
                   </button>
                   <button
-                    className="bg-[#4FC3F7] hover:bg-[#039BE5] text-white px-3 py-1 rounded text-sm font-bold transition-all duration-200"
+                    className="bg-[#4FC3F7] hover:bg-[#039BE5] text-white px-3 py-1 rounded text-xs sm:text-sm font-bold transition-all duration-200 w-full sm:w-auto"
                     onClick={() => abrirModalEditar(produto)}
                     disabled={loadingProduto}
                   >
@@ -579,6 +585,26 @@ export default function PainelEmpresa() {
                     onAccept={(value) => setEmpresaWhatsapp(String(value))}
                     placeholder="WhatsApp"
                     className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:ring-2 focus:ring-[#4FC3F7] text-black placeholder-[#B3E5FC]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-base font-semibold text-[#039BE5] mb-1">Horário de Atendimento</label>
+                  <textarea
+                    className="w-full p-3 border border-[#B3E5FC] rounded-lg text-black placeholder-[#B3E5FC] shadow-sm"
+                    value={empresaHorario}
+                    onChange={e => setEmpresaHorario(e.target.value)}
+                    placeholder="Ex: Seg a Sex: 09:00 - 18:00\nSábado: 09:00 - 12:00\nDomingo: Fechado"
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <label className="block text-base font-semibold text-[#039BE5] mb-1">Sobre Nós</label>
+                  <textarea
+                    className="w-full p-3 border border-[#B3E5FC] rounded-lg text-black placeholder-[#B3E5FC] shadow-sm"
+                    value={empresaSobre}
+                    onChange={e => setEmpresaSobre(e.target.value)}
+                    placeholder="Conte um pouco sobre sua empresa, missão, valores, etc."
+                    rows={3}
                   />
                 </div>
               </div>

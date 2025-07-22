@@ -66,7 +66,7 @@ export default function LoginEmpresa() {
         setMensagem("Usuário ou senha inválidos.");
       }
     } else {
-      setMensagem("Usuário ou senha inválidos.");
+      setMensagem("Usuário ou senha inválidos."); 
     }
   };
 

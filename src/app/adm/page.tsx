@@ -96,61 +96,63 @@ export default function PainelADM() {
   }
 
   return (
-    <div className="min-h-screen bg-white p-8">
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl p-8 border border-[#B3E5FC]">
-        <h1 className="text-3xl font-extrabold text-black mb-8 text-center">Painel do Administrador</h1>
-        {mensagem && <div className="mb-4 text-center text-[#039BE5] font-bold">{mensagem}</div>}
-        {loading ? (
-          <div className="text-center text-lg text-gray-500">Carregando imagens...</div>
-        ) : (
-          <>
-            {/* Carrossel */}
-            <section className="mb-10">
-              <h2 className="text-xl font-bold" style={{color:'#039BE5'}}>Carrossel (máx. 5)</h2>
-              <div className="flex gap-4 flex-wrap mb-4">
-                {carrossel.map((img, idx) => (
-                  <div key={img.id} className="bg-white border-2 rounded-xl shadow-lg p-4 flex flex-col items-center" style={{borderColor:'#4FC3F7'}}>
-                    <img src={img.url} alt="Carrossel" className="w-32 h-32 object-contain mb-2 rounded" />
-                    <span className="text-sm font-bold mb-2 text-black">Ordem: {img.ordem}</span>
-                    <button onClick={() => removerCarrossel(img.id)} className="bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded mb-1 transition-all duration-200">Remover</button>
-                  </div>
-                ))}
-                {carrossel.length < 5 && (
-                  <label className="bg-gray-100 border-2 border-dashed rounded-xl shadow-lg p-4 flex flex-col items-center justify-center cursor-pointer w-32 h-32" style={{borderColor:'#4FC3F7'}}>
-                    <span className="text-gray-500 mb-2">Adicionar</span>
-                    <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files && adicionarCarrossel(e.target.files[0])} />
-                    <span className="text-2xl" style={{color:'#039BE5'}}>+</span>
-                  </label>
-                )}
-              </div>
-            </section>
-            {/* Campanhas */}
-            <section>
-              <h2 className="text-xl font-bold" style={{color:'#039BE5'}}>Campanhas (máx. 10)</h2>
-              <div className="flex gap-4 flex-wrap mb-4">
-                {campanhas.map((img, idx) => (
-                  <div key={img.id} className="bg-white border-2 rounded-xl shadow-lg p-4 flex flex-col items-center" style={{borderColor:'#4FC3F7'}}>
-                    <img src={img.url} alt="Campanha" className="w-32 h-32 object-contain mb-2 rounded" />
-                    <span className="text-sm font-bold mb-2 text-black">Ordem: {img.ordem}</span>
-                    <label className="flex items-center gap-2 mb-2">
-                      <input type="checkbox" checked={img.mostrar} onChange={e => editarMostrarCampanha(img.id, e.target.checked)} className="accent-[#4FC3F7] w-4 h-4" />
-                      <span className="text-sm text-black">Mostrar</span>
+    <div className="min-h-screen bg-white p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-2xl w-full p-6 md:p-8 border border-[#B3E5FC] mb-8">
+          <h1 className="text-3xl font-extrabold text-black mb-8 text-center">Painel do Administrador</h1>
+          {mensagem && <div className="mb-4 text-center text-[#039BE5] font-bold">{mensagem}</div>}
+          {loading ? (
+            <div className="text-center text-lg text-gray-500">Carregando imagens...</div>
+          ) : (
+            <>
+              {/* Carrossel */}
+              <section className="mb-10">
+                <h2 className="text-xl font-bold" style={{color:'#039BE5'}}>Carrossel (máx. 5)</h2>
+                <div className="flex gap-4 flex-wrap mb-4">
+                  {carrossel.map((img, idx) => (
+                    <div key={img.id} className="bg-white border-2 rounded-xl shadow-lg p-4 flex flex-col items-center" style={{borderColor:'#4FC3F7'}}>
+                      <img src={img.url} alt="Carrossel" className="w-32 h-32 object-contain mb-2 rounded" />
+                      <span className="text-sm font-bold mb-2 text-black">Ordem: {img.ordem}</span>
+                      <button onClick={() => removerCarrossel(img.id)} className="bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded mb-1 transition-all duration-200">Remover</button>
+                    </div>
+                  ))}
+                  {carrossel.length < 5 && (
+                    <label className="bg-gray-100 border-2 border-dashed rounded-xl shadow-lg p-4 flex flex-col items-center justify-center cursor-pointer w-32 h-32" style={{borderColor:'#4FC3F7'}}>
+                      <span className="text-gray-500 mb-2">Adicionar</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files && adicionarCarrossel(e.target.files[0])} />
+                      <span className="text-2xl" style={{color:'#039BE5'}}>+</span>
                     </label>
-                    <button onClick={() => removerCampanha(img.id)} className="bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded transition-all duration-200">Remover</button>
-                  </div>
-                ))}
-                {campanhas.length < 10 && (
-                  <label className="bg-gray-100 border-2 border-dashed rounded-xl shadow-lg p-4 flex flex-col items-center justify-center cursor-pointer w-32 h-32" style={{borderColor:'#4FC3F7'}}>
-                    <span className="text-gray-500 mb-2">Adicionar</span>
-                    <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files && adicionarCampanha(e.target.files[0])} />
-                    <span className="text-2xl" style={{color:'#039BE5'}}>+</span>
-                  </label>
-                )}
-              </div>
-            </section>
-          </>
-        )}
+                  )}
+                </div>
+              </section>
+              {/* Campanhas */}
+              <section>
+                <h2 className="text-xl font-bold" style={{color:'#039BE5'}}>Campanhas (máx. 10)</h2>
+                <div className="flex gap-4 flex-wrap mb-4">
+                  {campanhas.map((img, idx) => (
+                    <div key={img.id} className="bg-white border-2 rounded-xl shadow-lg p-4 flex flex-col items-center" style={{borderColor:'#4FC3F7'}}>
+                      <img src={img.url} alt="Campanha" className="w-32 h-32 object-contain mb-2 rounded" />
+                      <span className="text-sm font-bold mb-2 text-black">Ordem: {img.ordem}</span>
+                      <label className="flex items-center gap-2 mb-2">
+                        <input type="checkbox" checked={img.mostrar} onChange={e => editarMostrarCampanha(img.id, e.target.checked)} className="accent-[#4FC3F7] w-4 h-4" />
+                        <span className="text-sm text-black">Mostrar</span>
+                      </label>
+                      <button onClick={() => removerCampanha(img.id)} className="bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded transition-all duration-200">Remover</button>
+                    </div>
+                  ))}
+                  {campanhas.length < 10 && (
+                    <label className="bg-gray-100 border-2 border-dashed rounded-xl shadow-lg p-4 flex flex-col items-center justify-center cursor-pointer w-32 h-32" style={{borderColor:'#4FC3F7'}}>
+                      <span className="text-gray-500 mb-2">Adicionar</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files && adicionarCampanha(e.target.files[0])} />
+                      <span className="text-2xl" style={{color:'#039BE5'}}>+</span>
+                    </label>
+                  )}
+                </div>
+              </section>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
-} 
+}

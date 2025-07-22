@@ -3,8 +3,16 @@
 import React, { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import ProductForm from "@/app/components/ProductForm";
 import { IMaskInput } from 'react-imask';
 import CurrencyInputField from 'react-currency-input-field';
+import dynamic from 'next/dynamic';
+
+// Carregar o componente de personalização dinamicamente para evitar problemas de SSR
+const PersonalizacaoLoja = dynamic(
+  () => import('@/app/components/PersonalizacaoLoja'),
+  { ssr: false }
+);
 
 interface Produto {
   id: string;
@@ -35,6 +43,9 @@ export default function PainelEmpresa() {
   const [editImagemFile, setEditImagemFile] = useState<File | null>(null);
   const [editImagemUrl, setEditImagemUrl] = useState("");
   const [loadingEditar, setLoadingEditar] = useState(false);
+
+  // Estado para modal de personalização
+  const [mostrarPersonalizacao, setMostrarPersonalizacao] = useState(false);
 
   // Estado para modal de edição da empresa
   const [editandoEmpresa, setEditandoEmpresa] = useState(false);
@@ -68,12 +79,13 @@ export default function PainelEmpresa() {
     setProdutoEditando(produto);
     setEditNome(produto.nome);
     setEditDescricao(produto.descricao);
-    setEditPreco(produto.preco ? produto.preco.toFixed(2).replace('.', ',') : "");
+    // Formatar o preço para o formato brasileiro (com vírgula como separador decimal)
+    const precoFormatado = produto.preco ? 
+      produto.preco.toString().replace('.', ',') : 
+      "0,00";
+    setEditPreco(precoFormatado);
     setEditImagemUrl(produto.imagem_url);
     setEditImagemFile(null);
-    setTimeout(() => {
-      if (editPrecoInputRef.current) editPrecoInputRef.current.value = produto.preco ? produto.preco.toFixed(2).replace('.', ',') : "";
-    }, 0);
   };
 
   const fecharModalEditar = () => {
@@ -304,149 +316,218 @@ export default function PainelEmpresa() {
   if (!empresa) return null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl p-8 border border-[#B3E5FC]">
-        <h1 className="text-3xl font-extrabold mb-6 text-center text-black tracking-tight">Painel da Empresa</h1>
-        <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
-          {empresa.logo_url && (
-            <img src={empresa.logo_url} alt="Logo da empresa" className="w-32 h-32 object-contain rounded-xl border-2 border-[#4FC3F7] bg-gray-100" />
-          )}
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-[#039BE5] mb-2">Bem-vindo, {empresa.nome}!</h2>
-            <p className="text-base text-gray-700 mb-1"><b>CNPJ:</b> {empresa.cnpj}</p>
-            <p className="text-base text-gray-700 mb-1"><b>E-mail:</b> {empresa.email}</p>
-            <p className="text-base text-gray-700 mb-1"><b>Telefone:</b> {empresa.telefone}</p>
-            <button
-              className="mt-2 bg-[#4FC3F7] hover:bg-[#039BE5] text-white px-4 py-2 rounded font-bold text-sm transition-all duration-200 border border-[#29B6F6]"
-              onClick={abrirModalEditarEmpresa}
-            >
-              Editar empresa
-            </button>
-          </div>
-        </div>
-        <form className="flex flex-col gap-4 mb-8 bg-[#F5FBFF] p-6 rounded-xl border border-[#B3E5FC]" onSubmit={handleCadastrarProduto}>
-          <h3 className="text-xl font-bold text-[#039BE5] mb-2">Cadastrar Produto</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-base font-semibold text-[#039BE5] mb-1">Nome do Produto</label>
-              <input type="text" className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4FC3F7] bg-white text-black placeholder-[#B3E5FC]" placeholder="Nome do produto" value={nomeProduto} onChange={e => setNomeProduto(e.target.value)} required />
-            </div>
-            <div>
-              <label className="block text-base font-semibold text-[#039BE5] mb-1">Preço</label>
-              <CurrencyInputField
-                id="cadastro-preco"
-                name="preco"
-                placeholder="R$ 0,00"
-                defaultValue={0}
-                decimalsLimit={2}
-                decimalSeparator="," 
-                groupSeparator="."
-                prefix="R$ "
-                className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4FC3F7] bg-white text-black placeholder-[#B3E5FC]"
-                onValueChange={(value) => {
-                  setPreco(value || "");
-                }}
-                ref={precoInputRef}
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-base font-semibold text-[#039BE5] mb-1">Descrição</label>
-              <textarea className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4FC3F7] bg-white text-black placeholder-[#B3E5FC]" placeholder="Descrição do produto" value={descricao} onChange={e => setDescricao(e.target.value)} rows={2} />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-base font-semibold text-[#039BE5] mb-1">Imagem do Produto</label>
-              <input type="file" accept="image/*" className="w-full p-3 border border-[#B3E5FC] rounded-lg bg-white text-black" onChange={handleImagemChange} />
-            </div>
-          </div>
-          <button type="submit" disabled={loadingProduto} className="w-full bg-gradient-to-r from-[#4FC3F7] to-[#039BE5] text-white p-3 rounded-lg font-bold text-lg shadow-lg hover:from-[#039BE5] hover:to-[#4FC3F7] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed mt-2">
-            {loadingProduto ? "Cadastrando..." : "Cadastrar Produto"}
-          </button>
-          {mensagem && <p className="mt-2 text-center text-[#039BE5] font-semibold">{mensagem}</p>}
-        </form>
-        <h3 className="text-xl font-bold text-[#039BE5] mb-4">Produtos Cadastrados</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {produtos.length === 0 && <p className="text-gray-500 col-span-2">Nenhum produto cadastrado ainda.</p>}
-          {produtos.map((produto) => (
-            <div key={produto.id} className="bg-white border-2 border-[#B3E5FC] rounded-xl shadow p-4 flex flex-col items-center">
-              {produto.imagem_url && (
-                <img src={produto.imagem_url} alt={produto.nome} className="w-24 h-24 object-contain mb-2 rounded" />
-              )}
-              <h4 className="text-lg font-bold text-[#039BE5] mb-1">{produto.nome}</h4>
-              <p className="text-[#4FC3F7] font-bold mb-1">R$ {produto.preco?.toFixed(2)}</p>
-              <p className="text-gray-700 text-sm mb-1 text-center">{produto.descricao}</p>
-              <span className="text-xs text-gray-400">{new Date(produto.created_at).toLocaleString()}</span>
-              <div className="flex gap-2 mt-2">
+    <div className="min-h-screen bg-white p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-2xl w-full p-6 md:p-8 border border-[#B3E5FC] mb-8">
+          <h1 className="text-3xl font-extrabold mb-6 text-center text-black tracking-tight">Painel da Empresa</h1>
+          <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
+            {empresa.logo_url && (
+              <img src={empresa.logo_url} alt="Logo da empresa" className="w-32 h-32 object-contain rounded-xl border-2 border-[#4FC3F7] bg-gray-100" />
+            )}
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-2xl font-bold text-gray-900">Painel da Empresa</h1>
+              <div className="flex space-x-4">
                 <button
-                  className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-bold transition-all duration-200"
-                  onClick={() => handleExcluirProduto(produto.id)}
-                  disabled={loadingProduto}
+                  onClick={() => setMostrarPersonalizacao(true)}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                  Excluir
-                </button>
-                <button
-                  className="bg-[#4FC3F7] hover:bg-[#039BE5] text-white px-3 py-1 rounded text-sm font-bold transition-all duration-200"
-                  onClick={() => abrirModalEditar(produto)}
-                  disabled={loadingProduto}
-                >
-                  Editar
+                  Personalizar Loja
                 </button>
               </div>
             </div>
-          ))}
-        </div>
-        <div className="flex flex-col md:flex-row gap-4 justify-center mt-8">
-          <button
-            className="bg-gradient-to-r from-[#4FC3F7] to-[#039BE5] text-white p-3 rounded-lg font-bold text-lg shadow-lg hover:from-[#039BE5] hover:to-[#4FC3F7] transition-all duration-200"
-            onClick={() => router.push('/')}
-          >
-            Voltar para Home
-          </button>
-        </div>
-      </div>
-      {/* Modal de edição de produto */}
-      {produtoEditando && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl border-2 border-green-600 relative animate-fadeIn">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-red-600 text-2xl font-bold" onClick={fecharModalEditar}>&times;</button>
-            <h3 className="text-2xl font-extrabold text-green-700 mb-6 text-center">Editar Produto</h3>
-            <form className="flex flex-col gap-4" onSubmit={handleSalvarEdicaoProduto}>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-[#039BE5] mb-2">Bem-vindo, {empresa.nome}!</h2>
+              <p className="text-base text-gray-700 mb-1"><b>CNPJ:</b> {empresa.cnpj}</p>
+              <p className="text-base text-gray-700 mb-1"><b>E-mail:</b> {empresa.email}</p>
+              <p className="text-base text-gray-700 mb-1"><b>Telefone:</b> {empresa.telefone}</p>
+              <button
+                className="mt-2 bg-[#4FC3F7] hover:bg-[#039BE5] text-white px-4 py-2 rounded font-bold text-sm transition-all duration-200 border border-[#29B6F6]"
+                onClick={abrirModalEditarEmpresa}
+              >
+                Editar empresa
+              </button>
+            </div>
+          </div>
+          <form className="flex flex-col gap-4 mb-8 bg-[#F5FBFF] p-6 rounded-xl border border-[#B3E5FC]" onSubmit={handleCadastrarProduto}>
+            <h3 className="text-xl font-bold text-[#039BE5] mb-2">Cadastrar Produto</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-base font-semibold text-green-900 mb-1">Nome do Produto</label>
-                <input type="text" className="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-400 text-black placeholder-gray-400" value={editNome} onChange={e => setEditNome(e.target.value)} required placeholder="Nome do produto" />
+                <label className="block text-base font-semibold text-[#039BE5] mb-1">Nome do Produto</label>
+                <input type="text" className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4FC3F7] bg-white text-black placeholder-[#B3E5FC]" placeholder="Nome do produto" value={nomeProduto} onChange={e => setNomeProduto(e.target.value)} required />
               </div>
               <div>
-                <label className="block text-base font-semibold text-green-900 mb-1">Preço</label>
+                <label className="block text-base font-semibold text-[#039BE5] mb-1">Preço</label>
                 <CurrencyInputField
-                  id="edit-preco"
+                  id="cadastro-preco"
                   name="preco"
                   placeholder="R$ 0,00"
-                  value={editPreco}
+                  defaultValue={0}
                   decimalsLimit={2}
                   decimalSeparator=","
                   groupSeparator="."
                   prefix="R$ "
-                  className="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-400 text-black placeholder-gray-400"
+                  className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4FC3F7] bg-white text-black placeholder-[#B3E5FC]"
                   onValueChange={(value) => {
-                    setEditPreco(value || "");
+                    setPreco(value || "");
                   }}
-                  ref={editPrecoInputRef}
+                  ref={precoInputRef}
                 />
               </div>
-              <div>
-                <label className="block text-base font-semibold text-green-900 mb-1">Descrição</label>
-                <textarea className="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-400 text-black placeholder-gray-400" value={editDescricao} onChange={e => setEditDescricao(e.target.value)} rows={2} placeholder="Descrição do produto" />
+              <div className="md:col-span-2">
+                <label className="block text-base font-semibold text-[#039BE5] mb-1">Descrição</label>
+                <textarea className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4FC3F7] bg-white text-black placeholder-[#B3E5FC]" placeholder="Descrição do produto" value={descricao} onChange={e => setDescricao(e.target.value)} rows={2} />
               </div>
-              <div>
-                <label className="block text-base font-semibold text-green-900 mb-1">Imagem do Produto</label>
-                <input type="file" accept="image/*" className="w-full p-3 border border-green-300 rounded-lg text-black" onChange={handleEditImagemChange} />
-                {editImagemUrl && (
-                  <img src={editImagemUrl} alt="Imagem atual" className="w-20 h-20 object-contain mt-2 rounded border" />
+              <div className="md:col-span-2">
+                <label className="block text-base font-semibold text-[#039BE5] mb-1">Imagem do Produto</label>
+                <input type="file" accept="image/*" className="w-full p-3 border border-[#B3E5FC] rounded-lg bg-white text-black" onChange={handleImagemChange} />
+              </div>
+            </div>
+            <button type="submit" disabled={loadingProduto} className="w-full bg-gradient-to-r from-[#4FC3F7] to-[#039BE5] text-white p-3 rounded-lg font-bold text-lg shadow-lg hover:from-[#039BE5] hover:to-[#4FC3F7] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed mt-2">
+              {loadingProduto ? "Cadastrando..." : "Cadastrar Produto"}
+            </button>
+            {mensagem && <p className="mt-2 text-center text-[#039BE5] font-semibold">{mensagem}</p>}
+          </form>
+          <h3 className="text-xl font-bold text-[#039BE5] mb-4">Produtos Cadastrados</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {produtos.length === 0 && <p className="text-gray-500 col-span-2">Nenhum produto cadastrado ainda.</p>}
+            {produtos.map((produto) => (
+              <div key={produto.id} className="bg-white border-2 border-[#B3E5FC] rounded-xl shadow p-4 flex flex-col items-center">
+                {produto.imagem_url && (
+                  <img src={produto.imagem_url} alt={produto.nome} className="w-24 h-24 object-contain mb-2 rounded" />
                 )}
+                <h4 className="text-lg font-bold text-[#039BE5] mb-1">{produto.nome}</h4>
+                <p className="text-[#4FC3F7] font-bold mb-1">R$ {produto.preco?.toFixed(2)}</p>
+                <p className="text-gray-700 text-sm mb-1 text-center">{produto.descricao}</p>
+                <span className="text-xs text-gray-400">{new Date(produto.created_at).toLocaleString()}</span>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-bold transition-all duration-200"
+                    onClick={() => handleExcluirProduto(produto.id)}
+                    disabled={loadingProduto}
+                  >
+                    Excluir
+                  </button>
+                  <button
+                    className="bg-[#4FC3F7] hover:bg-[#039BE5] text-white px-3 py-1 rounded text-sm font-bold transition-all duration-200"
+                    onClick={() => abrirModalEditar(produto)}
+                    disabled={loadingProduto}
+                  >
+                    Editar
+                  </button>
+                </div>
               </div>
-              <button type="submit" disabled={loadingEditar} className="w-full bg-gradient-to-r from-green-700 to-green-500 text-white p-3 rounded-lg font-bold text-lg shadow-lg hover:from-green-800 hover:to-green-600 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed mt-2">
-                {loadingEditar ? "Salvando..." : "Salvar Alterações"}
-              </button>
-            </form>
+            ))}
+          </div>
+          <div className="flex flex-col md:flex-row gap-4 justify-center mt-8">
+            <button
+              className="bg-gradient-to-r from-[#4FC3F7] to-[#039BE5] text-white p-3 rounded-lg font-bold text-lg shadow-lg hover:from-[#039BE5] hover:to-[#4FC3F7] transition-all duration-200"
+              onClick={() => router.push('/')}
+            >
+              Voltar para Home
+            </button>
+          </div>
+        </div>
+      </div>
+      {/* Modal de edição de produto */}
+      {/* Modal de Personalização */}
+      {mostrarPersonalizacao && empresa && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <PersonalizacaoLoja
+              empresaId={empresa.id}
+              onClose={() => setMostrarPersonalizacao(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Edição de Produto */}
+      {produtoEditando && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl border-2 relative animate-fadeIn" style={{ borderColor: '#29B6F6', maxHeight: '90vh', overflowY: 'auto' }}>
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-red-600 text-2xl font-bold z-10" onClick={fecharModalEditar}>&times;</button>
+            <h3 className="text-2xl font-extrabold text-[#039BE5] mb-6 text-center">Editar Produto</h3>
+            
+            <ProductForm
+              initialData={{
+                id: produtoEditando.id,
+                nome: editNome,
+                descricao: editDescricao,
+                preco: editPreco,
+                imagem_url: editImagemUrl
+              }}
+              onSubmit={async (data: { nome: string; descricao: string; preco: string; imagem: File | null }) => {
+                try {
+                  setLoadingEditar(true);
+                  
+                  // 1. Upload da nova imagem se houver
+                  let novaImagemUrl = editImagemUrl;
+                  if (data.imagem) {
+                    const fileExt = data.imagem.name.split('.').pop();
+                    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+                    const filePath = `produtos/${fileName}`;
+                    
+                    const { error: uploadError } = await supabase.storage
+                      .from('produtos')
+                      .upload(filePath, data.imagem);
+                      
+                    if (uploadError) throw uploadError;
+                    
+                    // Obter URL pública da nova imagem
+                    const { data: { publicUrl } } = supabase.storage
+                      .from('produtos')
+                      .getPublicUrl(filePath);
+                      
+                    novaImagemUrl = publicUrl;
+                  }
+                  
+                  // 2. Atualizar os dados do produto
+                  // Converter o preço do formato brasileiro para o formato numérico
+                  const precoNumerico = parseFloat(data.preco.replace(',', '.'));
+                  
+                  const updateData: any = {
+                    nome: data.nome,
+                    descricao: data.descricao,
+                    preco: precoNumerico,
+                    ...(novaImagemUrl && { imagem_url: novaImagemUrl })
+                  };
+                  
+                  const { error } = await supabase
+                    .from('produtos')
+                    .update(updateData)
+                    .eq('id', produtoEditando.id);
+                    
+                  if (error) throw error;
+                  
+                  // 3. Atualizar a lista de produtos
+                  const updatedProdutos = produtos.map(p => 
+                    p.id === produtoEditando.id 
+                      ? { 
+                          ...p, 
+                          nome: data.nome, 
+                          descricao: data.descricao, 
+                          preco: parseFloat(data.preco),
+                          ...(novaImagemUrl && { imagem_url: novaImagemUrl })
+                        } 
+                      : p
+                  );
+                  setProdutos(updatedProdutos);
+                  
+                  // 4. Fechar o modal e mostrar mensagem de sucesso
+                  setMensagem("Produto atualizado com sucesso!");
+                  fecharModalEditar();
+                  
+                } catch (error) {
+                  console.error("Erro ao atualizar produto:", error);
+                  setMensagem("Erro ao atualizar produto: " + (error as Error).message);
+                } finally {
+                  setLoadingEditar(false);
+                }
+              }}
+              isSubmitting={loadingEditar}
+              title=""
+              submitButtonText={loadingEditar ? "Salvando..." : "Salvar Alterações"}
+            />
           </div>
         </div>
       )}
@@ -588,4 +669,4 @@ export default function PainelEmpresa() {
       )}
     </div>
   );
-} 
+}

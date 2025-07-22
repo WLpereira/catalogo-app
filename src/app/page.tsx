@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from '@/lib/supabaseClient';
+import { useSearch } from './contexts/SearchContext';
 
 interface Produto {
   id: string;
@@ -29,7 +30,7 @@ export default function Home() {
   const router = useRouter();
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [busca, setBusca] = useState("");
+  const { searchQuery: busca, setSearchQuery: setBusca } = useSearch();
   const [tipoBusca, setTipoBusca] = useState("produto");
   const [ordenacao, setOrdenacao] = useState("nome");
   const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(null);
@@ -151,16 +152,22 @@ export default function Home() {
     fetchAll();
   }, []);
 
-  // Filtro e ordenação dos produtos (igual antes)
-  const produtosFiltrados = produtos.filter((produto) => {
-    if (tipoBusca === "produto") {
-      return produto.nome.toLowerCase().includes(busca.toLowerCase()) ||
-             (produto.descricao || "").toLowerCase().includes(busca.toLowerCase());
-    } else {
-      return (produto.empresa_nome || "").toLowerCase().includes(busca.toLowerCase());
-    }
-  });
-  const produtosOrdenados = [...produtosFiltrados].sort((a, b) => {
+  // Filtro e ordenação dos produtos
+  const produtosFiltrados = React.useMemo(() => {
+    return produtos.filter((produto) => {
+      if (!busca) return true; // Se não houver busca, retorna todos os produtos
+      
+      const searchLower = busca.toLowerCase();
+      if (tipoBusca === "produto") {
+        return produto.nome.toLowerCase().includes(searchLower) ||
+               (produto.descricao || "").toLowerCase().includes(searchLower);
+      } else {
+        return (produto.empresa_nome || "").toLowerCase().includes(searchLower);
+      }
+    });
+  }, [produtos, busca, tipoBusca]);
+  const produtosOrdenados = React.useMemo(() => {
+    return [...produtosFiltrados].sort((a, b) => {
     if (ordenacao === "nome") {
       return a.nome.localeCompare(b.nome);
     } else if (ordenacao === "preco_asc") {
@@ -168,51 +175,24 @@ export default function Home() {
     } else if (ordenacao === "preco_desc") {
       return (b.preco || 0) - (a.preco || 0);
     }
-    return 0;
-  });
+      return 0;
+    });
+  }, [produtosFiltrados, ordenacao]);
 
   // Campanhas para o meio e final
   const meioCount = Math.ceil(campanhas.length / 2);
   const campanhasMeio = campanhas.slice(0, meioCount);
   const campanhasFinal = campanhas.slice(meioCount);
 
+  // Função para lidar com a busca
+  const handleSearch = (query: string) => {
+    setBusca(query);
+  };
+
+  // Removendo o efeito de sincronização desnecessário
+
   return (
     <div className="min-h-screen bg-white p-0">
-      {/* HEADER */}
-      <header className="w-full bg-white text-black flex items-center justify-between px-8 py-4 shadow-md sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          {/* Logo ClickGo */}
-          <span className="flex items-center font-extrabold text-2xl rounded overflow-hidden">
-            <span className="pl-2 pr-0 py-1 text-black">Click</span><span className="pl-0 pr-2 py-1" style={{background:'#4FC3F7', color:'white', borderRadius:'0 8px 8px 0'}}>Go</span>
-          </span>
-        </div>
-        <form className="flex-1 flex justify-center max-w-2xl mx-6">
-          <div className="relative w-full">
-            <input
-              type="text"
-              className="w-full p-3 pl-12 rounded-lg bg-gray-100 text-black border-2"
-              style={{ borderColor: '#4FC3F7', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
-              placeholder="O que você procura?"
-              value={busca}
-              onChange={e => setBusca(e.target.value)}
-            />
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl pointer-events-none" style={{color:'#4FC3F7'}}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-7 h-7">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
-              </svg>
-            </span>
-          </div>
-          <button type="submit" className="ml-2" style={{background:'#4FC3F7', color:'white', borderRadius:'8px', fontWeight:'bold', fontSize:'1.125rem', boxShadow:'0 2px 8px rgba(0,0,0,0.08)', padding:'0.75rem 1.5rem', transition:'all 0.2s'}}>
-            Buscar
-          </button>
-        </form>
-        <button
-          onClick={() => router.push('/empresa/login')}
-          className="bg-black text-white px-6 py-3 rounded-lg font-bold text-lg shadow-lg hover:bg-blue-400 transition-all duration-200"
-        >
-          Área da Empresa
-        </button>
-      </header>
       {/* CARROSSEL NO BANNER */}
       <div className="w-full flex items-center justify-center px-0 py-0 md:py-0 gap-0 shadow-lg min-h-[260px] relative overflow-hidden bg-black">
         {carrossel.length > 0 ? (

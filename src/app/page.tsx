@@ -33,8 +33,6 @@ export default function Home() {
   const { searchQuery: busca, setSearchQuery: setBusca } = useSearch();
   const [tipoBusca, setTipoBusca] = useState("produto");
   const [ordenacao, setOrdenacao] = useState("nome");
-  const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(null);
-  const [quantidade, setQuantidade] = useState(1);
   // Novos estados para carrossel e campanhas
   const [carrossel, setCarrossel] = useState<CarrosselImg[]>([]);
   const [campanhas, setCampanhas] = useState<CampanhaImg[]>([]);
@@ -189,34 +187,38 @@ export default function Home() {
     setBusca(query);
   };
 
-  // Removendo o efeito de sincronização desnecessário
+  // Função para navegar para a página do produto
+  const handleProdutoClick = (produtoId: string) => {
+    window.location.href = `/produto/${produtoId}`;
+  };
 
   return (
     <div className="min-h-screen bg-white p-0">
-      {/* CARROSSEL NO BANNER */}
-      <div className="w-full flex items-center justify-center px-0 py-0 md:py-0 gap-0 shadow-lg min-h-[260px] relative overflow-hidden bg-black">
+      {/* BANNER PRINCIPAL */}
+      <div className="w-full flex items-center justify-center px-0 py-0 md:py-0 gap-0 shadow-2xl min-h-[320px] md:min-h-[420px] relative overflow-hidden bg-white">
+        {/* Código do carrossel existente */}
         {carrossel.length > 0 ? (
           <>
             <img
               src={carrossel[carrosselIndex].url}
               alt="Carrossel"
-              className="w-full h-[260px] md:h-[340px] object-cover bg-black transition-all duration-700"
+              className="w-full h-[320px] md:h-[420px] object-cover bg-black transition-all duration-700 rounded-b-3xl shadow-xl"
               style={{ maxWidth: '100vw' }}
             />
             {/* Setas */}
-            <button onClick={handlePrev} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white hover:bg-blue-400 text-black hover:text-white rounded-full p-2 text-2xl z-10 shadow-lg transition-all duration-200">
+            <button onClick={handlePrev} className="absolute left-6 top-1/2 -translate-y-1/2 bg-white hover:bg-gray-200 text-black rounded-full p-3 text-3xl z-10 shadow-xl transition-all duration-200">
               &#8592;
             </button>
-            <button onClick={handleNext} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white hover:bg-blue-400 text-black hover:text-white rounded-full p-2 text-2xl z-10 shadow-lg transition-all duration-200">
+            <button onClick={handleNext} className="absolute right-6 top-1/2 -translate-y-1/2 bg-white hover:bg-gray-200 text-black rounded-full p-3 text-3xl z-10 shadow-xl transition-all duration-200">
               &#8594;
             </button>
             {/* Indicadores */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
               {carrossel.map((img, idx) => (
                 <span
                   key={img.id}
-                  className={`w-4 h-2 rounded-full ${carrosselIndex === idx ? '' : ''} transition-all duration-300`}
-                  style={{ display: 'inline-block', background: carrosselIndex === idx ? '#4FC3F7' : '#B3E5FC' }}
+                  className={`w-5 h-2.5 rounded-full transition-all duration-300 ${carrosselIndex === idx ? 'bg-[#039BE5] scale-110' : 'bg-[#B3E5FC]'}`}
+                  style={{ display: 'inline-block' }}
                 />
               ))}
             </div>
@@ -225,66 +227,83 @@ export default function Home() {
           <span className="text-white text-lg">Nenhuma imagem no carrossel ainda.</span>
         )}
       </div>
-      {/* OFERTAS RELÂMPAGO */}
+
+      {/* PRIMEIRA SEÇÃO DE OFERTAS */}
       {campanhasVisiveis.length > 0 && (
-        <section className="w-full bg-white py-10 shadow-lg border-b border-gray-200">
-          <div className="max-w-6xl mx-auto px-2 sm:px-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-              <div className="flex items-center gap-4 justify-center">
-                <span style={{color:'#039BE5'}} className="font-extrabold text-2xl tracking-widest animate-pulse text-center">OFERTAS RELÂMPAGO</span>
-                <span className="bg-black text-white px-3 py-2 rounded font-mono text-xl flex items-center gap-1">
-                  {String(countdown.h).padStart(2, '0')} : {String(countdown.m).padStart(2, '0')} : {String(countdown.s).padStart(2, '0')}
-                </span>
+        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 py-6 border-y border-amber-100">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="bg-amber-500 text-white px-4 py-1.5 rounded-full text-sm font-bold flex items-center shadow-md">
+                  <span className="animate-pulse">⚡</span>
+                  <span className="ml-2">OFERTA RELÂMPAGO</span>
+                </div>
+                <div className="flex items-center bg-white px-4 py-1.5 rounded-full border border-amber-200 shadow-sm">
+                  <span className="text-amber-700 font-bold text-sm">
+                    ACABA EM: {String(countdown.h).padStart(2, '0')}:{String(countdown.m).padStart(2, '0')}
+                  </span>
+                </div>
               </div>
-              <button style={{color:'#039BE5'}} className="font-bold hover:underline text-base text-center">Ver Tudo</button>
-            </div>
-            <div className="relative flex items-center justify-center w-full">
-              <button onClick={handlePrevOferta} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden md:block" style={{background:'#4FC3F7', color:'white', borderRadius:'9999px', padding:'0.75rem', fontSize:'1.5rem', boxShadow:'0 2px 8px rgba(0,0,0,0.08)', transition:'all 0.2s'}}>
-                &#8592;
+              <button 
+                className="text-amber-700 hover:text-amber-800 text-sm font-semibold flex items-center bg-white px-4 py-1.5 rounded-full border border-amber-200 hover:bg-amber-50 transition-colors shadow-sm"
+                onClick={() => {
+                  const ofertasMeio = document.getElementById('ofertas-meio');
+                  if (ofertasMeio) {
+                    window.scrollTo({ 
+                      top: ofertasMeio.offsetTop - 100, 
+                      behavior: 'smooth' 
+                    });
+                  }
+                }}
+              >
+                Ver mais ofertas
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
               </button>
-              <div className="flex gap-2 sm:gap-4 px-0 sm:px-4 w-full justify-center items-center" style={{height:'340px', overflowY:'visible', overflowX:'hidden'}}>
-                {campanhasSlide.map(img => (
-                  <div key={img.id} className="bg-white border-2 rounded-2xl shadow-md flex flex-col items-center justify-between p-2 w-[180px] sm:w-[220px] h-[200px] sm:h-[240px] min-w-[150px] max-w-[220px] hover:scale-105 transition-all duration-300 relative group overflow-hidden" style={{borderColor:'#29B6F6', marginTop:'50px', marginBottom:'50px'}}>
-                    <img src={img.url} alt="Oferta" className="object-contain h-16 sm:h-24 w-full mb-2 rounded" />
-                    {/* Modal flutuante ao passar o mouse */}
-                    <div className="hidden group-hover:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white bg-opacity-98 rounded-2xl shadow-2xl flex-col items-center justify-center p-6 z-20 transition-all duration-200 overflow-hidden" style={{width:'320px', height:'320px', minWidth:'220px', maxWidth:'95vw', minHeight:'220px'}}>
-                      <img src={img.url} alt="Oferta" className="object-contain h-24 w-full mb-2 rounded" />
-                      <span className="text-lg font-bold" style={{color:'#039BE5'}}>Oferta Especial!</span>
-                      <span className="text-sm text-blue-500 mt-2 text-center">Clique aqui</span>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+              {campanhasVisiveis.slice(0, 6).map((img, index) => (
+                <div 
+                  key={img.id} 
+                  className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-amber-100 group"
+                >
+                  <div className="relative pt-[100%] bg-white">
+                    <img 
+                      src={img.url} 
+                      alt="Oferta Especial" 
+                      className="absolute top-0 left-0 w-full h-full object-contain p-3"
+                    />
+                    <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+                      -{20 + index * 5}%
                     </div>
                   </div>
-                ))}
-              </div>
-              <button onClick={handleNextOferta} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden md:block" style={{background:'#4FC3F7', color:'white', borderRadius:'9999px', padding:'0.75rem', fontSize:'1.5rem', boxShadow:'0 2px 8px rgba(0,0,0,0.08)', transition:'all 0.2s'}}>
-                &#8594;
-              </button>
-              {/* Botões para mobile */}
-              <button onClick={handlePrevOferta} className="md:hidden absolute left-2 bottom-2 z-10" style={{background:'#4FC3F7', color:'white', borderRadius:'9999px', padding:'0.5rem', fontSize:'1.25rem', boxShadow:'0 2px 8px rgba(0,0,0,0.08)', transition:'all 0.2s'}}>
-                &#8592;
-              </button>
-              <button onClick={handleNextOferta} className="md:hidden absolute right-2 bottom-2 z-10" style={{background:'#4FC3F7', color:'white', borderRadius:'9999px', padding:'0.5rem', fontSize:'1.25rem', boxShadow:'0 2px 8px rgba(0,0,0,0.08)', transition:'all 0.2s'}}>
-                &#8594;
-              </button>
-              {/* Indicadores */}
-              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                {Array.from({ length: ofertaSlideCount }).map((_, idx) => (
-                  <span
-                    key={idx}
-                    className={`w-4 h-2 rounded-full transition-all duration-300`}
-                    style={{ display: 'inline-block', background: ofertaIndex === idx ? '#4FC3F7' : '#B3E5FC' }}
-                  />
-                ))}
-              </div>
+                  <div className="p-3">
+                    <h3 className="font-bold text-gray-800 text-sm line-clamp-2 mb-2 group-hover:text-amber-600 transition-colors">
+                      Oferta Exclusiva {index + 1}
+                    </h3>
+                    <div className="flex items-baseline justify-between">
+                      <div>
+                        <span className="text-base font-extrabold text-amber-600">R$ {99 - index * 10},90</span>
+                        <span className="text-xs text-gray-400 line-through ml-1">R$ {149 - index * 10},90</span>
+                      </div>
+                      <button className="text-amber-600 hover:text-white hover:bg-amber-600 text-xs font-semibold py-1 px-2 rounded-full border border-amber-200 hover:border-amber-600 transition-colors">
+                        Comprar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </section>
+        </div>
       )}
-      {/* PRODUTOS */}
-      <div className="max-w-6xl mx-auto py-12">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4 md:gap-0 px-4">
-          <h1 className="text-3xl font-extrabold text-black tracking-tight flex items-center gap-4">
-            Produtos em Destaque
-          </h1>
+
+      {/* PRODUTOS EM DESTAQUE */}
+      <div className="max-w-6xl mx-auto py-12 px-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+          <h1 className="text-3xl font-extrabold text-black tracking-tight">Produtos em Destaque</h1>
           <select
             className="p-3 border-2 rounded-lg text-black bg-white font-semibold shadow focus:ring-2 transition-all duration-200"
             value={ordenacao}
@@ -296,57 +315,150 @@ export default function Home() {
             <option value="preco_desc">Preço (maior para menor)</option>
           </select>
         </div>
+        
         {loading ? (
           <div className="text-center text-gray-400 text-xl">Carregando produtos...</div>
         ) : (
-          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-4 md:gap-10">
-            {produtosOrdenados.length === 0 && <p className="text-gray-400 col-span-3">Nenhum produto cadastrado ainda.</p>}
-            {produtosOrdenados.map((produto) => (
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-6">
+            {produtosOrdenados.length === 0 && (
+              <p className="text-gray-400 col-span-3 text-center">Nenhum produto cadastrado ainda.</p>
+            )}
+            {produtosOrdenados.slice(0, 6).map((produto) => (
               <div
                 key={produto.id}
-                className="bg-white border-2 rounded-2xl shadow-lg p-6 flex flex-col items-center cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-200 group"
-                onClick={() => { setProdutoSelecionado(produto); setQuantidade(1); }}
-                style={{borderColor:'#29B6F6'}}
+                className="bg-white border border-gray-100 rounded-xl shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group"
+                onClick={() => handleProdutoClick(produto.id)}
               >
                 {produto.imagem_url && (
-                  <img src={produto.imagem_url} alt={produto.nome} className="w-32 h-32 object-contain mb-2 rounded group-hover:drop-shadow-lg transition-all duration-200" />
+                  <img 
+                    src={produto.imagem_url} 
+                    alt={produto.nome} 
+                    className="w-24 h-24 object-contain mb-3 rounded-lg transition-all duration-200 bg-gray-50 p-2"
+                  />
                 )}
-                <h4 className="text-lg font-bold text-black mb-1 group-hover:text-blue-400 transition-all duration-200">{produto.nome}</h4>
-                <p className="font-bold mb-1" style={{color:'#039BE5'}}>R$ {produto.preco?.toFixed(2)}</p>
-                <p className="text-gray-700 text-sm mb-1 text-center">{produto.descricao}</p>
-                <span className="text-xs text-gray-500 font-semibold">Empresa: {produto.empresa_nome}</span>
+                <h4 className="text-base font-semibold text-gray-800 mb-1 group-hover:text-blue-500 transition-all duration-200 text-center">
+                  {produto.nome}
+                </h4>
+                <p className="font-bold mb-1 text-[#039BE5] text-lg">R$ {produto.preco?.toFixed(2).replace('.', ',')}</p>
+                {produto.descricao && (
+                  <p className="text-gray-600 text-xs mb-2 text-center line-clamp-2">
+                    {produto.descricao}
+                  </p>
+                )}
+                <span className="text-xs text-gray-400 font-medium mt-auto">
+                  {produto.empresa_nome}
+                </span>
               </div>
             ))}
           </div>
         )}
       </div>
-      {/* Modal de compra na home */}
-      {produtoSelecionado && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2 xs:p-4">
-          <div className="bg-white rounded-2xl p-4 xs:p-6 sm:p-8 w-full max-w-md shadow-2xl border border-gray-200 relative">
-            <button className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold transition-all duration-200" onClick={() => setProdutoSelecionado(null)}>&times;</button>
-            <h3 className="text-base xs:text-lg sm:text-xl font-bold mb-2 sm:mb-4" style={{color:'#039BE5'}}>Finalizar Compra</h3>
-            <div className="flex flex-col items-center mb-2 sm:mb-4">
-              {produtoSelecionado.imagem_url && (
-                <img src={produtoSelecionado.imagem_url} alt={produtoSelecionado.nome} className="w-20 h-20 xs:w-24 xs:h-24 object-contain mb-2 rounded" />
-              )}
-              <h4 className="text-base xs:text-lg font-bold text-black mb-1">{produtoSelecionado.nome}</h4>
-              <p className="font-bold mb-1" style={{color:'#039BE5'}}>R$ {produtoSelecionado.preco?.toFixed(2)}</p>
-              <p className="text-gray-700 text-xs xs:text-sm mb-1 text-center">{produtoSelecionado.descricao}</p>
+
+      {/* SEGUNDA SEÇÃO DE OFERTAS */}
+      {campanhasVisiveis.length > 0 && (
+        <div id="ofertas-meio" className="bg-gradient-to-r from-blue-50 to-cyan-50 py-12 border-y border-blue-100">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Ofertas Imperdíveis</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">Aproveite nossas ofertas especiais por tempo limitado</p>
+              
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                <div className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-bold flex items-center shadow-md">
+                  <span className="animate-pulse">🔥</span>
+                  <span className="ml-2">OFERTA ESPECIAL</span>
+                </div>
+                <div className="flex items-center bg-white px-4 py-1.5 rounded-full border border-blue-200 shadow-sm">
+                  <span className="text-blue-700 font-bold text-sm">
+                    TERMINA EM: {String(countdown.h).padStart(2, '0')}:{String(countdown.m).padStart(2, '0')}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col gap-2 mb-2 sm:mb-4">
-              <label className="block text-sm xs:text-base font-semibold text-black mb-1">Quantidade</label>
-              <input type="number" min={1} value={quantidade} onChange={e => setQuantidade(Number(e.target.value))} className="w-full p-2 xs:p-3 border rounded-lg focus:ring-2 text-black placeholder-gray-400" style={{borderColor:'#4FC3F7', boxShadow:'0 2px 8px rgba(0,0,0,0.04)'}} />
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {[...campanhasVisiveis].slice(0, 5).map((img, index) => (
+                <div 
+                  key={`oferta-${index}`} 
+                  className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-blue-50 group"
+                >
+                  <div className="relative pt-[100%] bg-white">
+                    <img 
+                      src={img.url} 
+                      alt="Oferta Especial" 
+                      className="absolute top-0 left-0 w-full h-full object-contain p-4"
+                    />
+                    <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+                      -{15 + index * 5}%
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-gray-800 text-sm line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors">
+                      Oferta Exclusiva {index + 1}
+                    </h3>
+                    <div className="flex items-baseline justify-between">
+                      <div>
+                        <span className="text-base font-extrabold text-blue-600">R$ {89 - index * 10},90</span>
+                        <span className="text-xs text-gray-400 line-through ml-1">R$ {139 - index * 10},90</span>
+                      </div>
+                      <button className="text-blue-600 hover:text-white hover:bg-blue-600 text-xs font-semibold py-1 px-2 rounded-full border border-blue-200 hover:border-blue-600 transition-colors">
+                        Ver oferta
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-            <button className="w-full text-white p-2 xs:p-3 rounded-lg font-bold text-base xs:text-lg shadow-lg transition-all duration-200 mt-2" style={{background:'linear-gradient(90deg, #4FC3F7 0%, #29B6F6 100%)'}} onClick={() => alert('Compra simulada!')}>
-              Finalizar Compra
-            </button>
-            <button className="w-full mt-2 bg-black text-white p-2 xs:p-3 rounded-lg font-bold text-base xs:text-lg shadow-lg hover:bg-blue-400 transition-all duration-200" onClick={() => { router.push(`/empresa/${produtoSelecionado.empresa_id}`); setProdutoSelecionado(null); }}>
-              Ver página da empresa
-            </button>
+            
+            <div className="text-center mt-10">
+              <button 
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-8 rounded-full shadow-md hover:shadow-lg transition-all duration-300 inline-flex items-center"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+                Voltar para o topo
+              </button>
+            </div>
           </div>
         </div>
       )}
+
+      {/* SEGUNDA PARTE DOS PRODUTOS */}
+      {!loading && produtosOrdenados.length > 6 && (
+        <div className="max-w-6xl mx-auto py-12 px-4">
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-6">
+            {produtosOrdenados.slice(6).map((produto) => (
+              <div
+                key={produto.id}
+                className="bg-white border border-gray-100 rounded-xl shadow p-5 flex flex-col items-center cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group"
+                onClick={() => handleProdutoClick(produto.id)}
+              >
+                {produto.imagem_url && (
+                  <img 
+                    src={produto.imagem_url} 
+                    alt={produto.nome} 
+                    className="w-24 h-24 object-contain mb-3 rounded-lg transition-all duration-200 bg-gray-50 p-2"
+                  />
+                )}
+                <h4 className="text-base font-semibold text-gray-800 mb-1 group-hover:text-blue-500 transition-all duration-200 text-center">
+                  {produto.nome}
+                </h4>
+                <p className="font-bold mb-1 text-[#039BE5] text-lg">R$ {produto.preco?.toFixed(2).replace('.', ',')}</p>
+                {produto.descricao && (
+                  <p className="text-gray-600 text-xs mb-2 text-center line-clamp-2">
+                    {produto.descricao}
+                  </p>
+                )}
+                <span className="text-xs text-gray-400 font-medium mt-auto">
+                  {produto.empresa_nome}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -196,7 +196,7 @@ export default function Home() {
     <div className="min-h-screen bg-white p-0">
       {/* BANNER PRINCIPAL */}
       <div className="w-full flex items-center justify-center px-0 py-0 md:py-0 gap-0 shadow-2xl min-h-[320px] md:min-h-[420px] relative overflow-hidden bg-white">
-        {/* Código do carrossel existente */}
+        {/* Código do carrossel existente   */}
         {carrossel.length > 0 ? (
           <>
             <img

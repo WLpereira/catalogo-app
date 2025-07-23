@@ -7,7 +7,7 @@ import Footer from '@/app/components/Footer';
 import { Empresa, Produto } from '@/types/empresa';
 
 
-
+   
 export default function EmpresaPage() {
   const params = useParams();
   const empresaId = params.id as string;

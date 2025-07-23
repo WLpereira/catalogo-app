@@ -21,7 +21,7 @@ export default function EmpresaPage() {
   const [corPrimaria, setCorPrimaria] = useState('#29B6F6');
   const [corSecundaria, setCorSecundaria] = useState('#4FC3F7');
   
-  // Função para formatar o preço em reais R$
+  // Função para formatar o preço em reais    R$
   const formatarPreco = (valor: number) => {
     return valor.toLocaleString('pt-BR', {
       style: 'currency',

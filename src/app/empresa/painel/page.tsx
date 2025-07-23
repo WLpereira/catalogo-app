@@ -139,6 +139,7 @@ export default function PainelEmpresa() {
       setMensagem("Erro ao editar produto: " + error.message);
     } else {
       setMensagem("Produto editado com sucesso!");
+      if (!empresa) return;
       // Atualiza lista
       const { data } = await supabase.from("produtos").select("*").eq("empresa_id", empresa.id).order("created_at", { ascending: false });
       setProdutos(data || []);

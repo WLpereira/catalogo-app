@@ -299,7 +299,7 @@ export default function Home() {
         {loading ? (
           <div className="text-center text-gray-400 text-xl">Carregando produtos...</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-4 md:gap-10">
             {produtosOrdenados.length === 0 && <p className="text-gray-400 col-span-3">Nenhum produto cadastrado ainda.</p>}
             {produtosOrdenados.map((produto) => (
               <div
@@ -322,26 +322,26 @@ export default function Home() {
       </div>
       {/* Modal de compra na home */}
       {produtoSelecionado && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl border border-gray-200 relative">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2 xs:p-4">
+          <div className="bg-white rounded-2xl p-4 xs:p-6 sm:p-8 w-full max-w-md shadow-2xl border border-gray-200 relative">
             <button className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold transition-all duration-200" onClick={() => setProdutoSelecionado(null)}>&times;</button>
-            <h3 className="text-xl font-bold mb-4" style={{color:'#039BE5'}}>Finalizar Compra</h3>
-            <div className="flex flex-col items-center mb-4">
+            <h3 className="text-base xs:text-lg sm:text-xl font-bold mb-2 sm:mb-4" style={{color:'#039BE5'}}>Finalizar Compra</h3>
+            <div className="flex flex-col items-center mb-2 sm:mb-4">
               {produtoSelecionado.imagem_url && (
-                <img src={produtoSelecionado.imagem_url} alt={produtoSelecionado.nome} className="w-24 h-24 object-contain mb-2 rounded" />
+                <img src={produtoSelecionado.imagem_url} alt={produtoSelecionado.nome} className="w-20 h-20 xs:w-24 xs:h-24 object-contain mb-2 rounded" />
               )}
-              <h4 className="text-lg font-bold text-black mb-1">{produtoSelecionado.nome}</h4>
+              <h4 className="text-base xs:text-lg font-bold text-black mb-1">{produtoSelecionado.nome}</h4>
               <p className="font-bold mb-1" style={{color:'#039BE5'}}>R$ {produtoSelecionado.preco?.toFixed(2)}</p>
-              <p className="text-gray-700 text-sm mb-1 text-center">{produtoSelecionado.descricao}</p>
+              <p className="text-gray-700 text-xs xs:text-sm mb-1 text-center">{produtoSelecionado.descricao}</p>
             </div>
-            <div className="flex flex-col gap-2 mb-4">
-              <label className="block text-base font-semibold text-black mb-1">Quantidade</label>
-              <input type="number" min={1} value={quantidade} onChange={e => setQuantidade(Number(e.target.value))} className="w-full p-3 border rounded-lg focus:ring-2 text-black placeholder-gray-400" style={{borderColor:'#4FC3F7', boxShadow:'0 2px 8px rgba(0,0,0,0.04)'}} />
+            <div className="flex flex-col gap-2 mb-2 sm:mb-4">
+              <label className="block text-sm xs:text-base font-semibold text-black mb-1">Quantidade</label>
+              <input type="number" min={1} value={quantidade} onChange={e => setQuantidade(Number(e.target.value))} className="w-full p-2 xs:p-3 border rounded-lg focus:ring-2 text-black placeholder-gray-400" style={{borderColor:'#4FC3F7', boxShadow:'0 2px 8px rgba(0,0,0,0.04)'}} />
             </div>
-            <button className="w-full text-white p-3 rounded-lg font-bold text-lg shadow-lg transition-all duration-200 mt-2" style={{background:'linear-gradient(90deg, #4FC3F7 0%, #29B6F6 100%)'}} onClick={() => alert('Compra simulada!')}>
+            <button className="w-full text-white p-2 xs:p-3 rounded-lg font-bold text-base xs:text-lg shadow-lg transition-all duration-200 mt-2" style={{background:'linear-gradient(90deg, #4FC3F7 0%, #29B6F6 100%)'}} onClick={() => alert('Compra simulada!')}>
               Finalizar Compra
             </button>
-            <button className="w-full mt-2 bg-black text-white p-3 rounded-lg font-bold text-lg shadow-lg hover:bg-blue-400 transition-all duration-200" onClick={() => { router.push(`/empresa/${produtoSelecionado.empresa_id}`); setProdutoSelecionado(null); }}>
+            <button className="w-full mt-2 bg-black text-white p-2 xs:p-3 rounded-lg font-bold text-base xs:text-lg shadow-lg hover:bg-blue-400 transition-all duration-200" onClick={() => { router.push(`/empresa/${produtoSelecionado.empresa_id}`); setProdutoSelecionado(null); }}>
               Ver página da empresa
             </button>
           </div>

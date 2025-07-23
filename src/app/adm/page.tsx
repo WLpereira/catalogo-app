@@ -96,17 +96,11 @@ export default function PainelADM() {
   }
 
   return (
-    <div className="min-h-screen bg-white p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-2xl w-full p-6 md:p-8 border border-[#B3E5FC] mb-8">
-          <h1 className="text-3xl font-extrabold text-black mb-8 text-center">Painel do Administrador</h1>
-          {mensagem && <div className="mb-4 text-center text-[#039BE5] font-bold">{mensagem}</div>}
-          {loading ? (
-            <div className="text-center text-lg text-gray-500">Carregando imagens...</div>
-          ) : (
-            <>
-              {/* Carrossel */}
-              <section className="mb-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 p-2 xs:p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg xs:max-w-xl md:max-w-2xl p-4 xs:p-6 md:p-8 border-2" style={{borderColor: '#4FC3F7'}}>
+        <div className="text-center mb-6 xs:mb-8">
+          <h1 className="text-xl xs:text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Painel Administrativo</h1>
+          <p className="text-gray-600 text-sm xs:text-base">Gerencie o carrossel e campanhas do site</p>
                 <h2 className="text-xl font-bold" style={{color:'#039BE5'}}>Carrossel (máx. 5)</h2>
                 <div className="flex gap-4 flex-wrap mb-4">
                   {carrossel.map((img, idx) => (

@@ -80,11 +80,11 @@ export default function CadastroEmpresa() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-8 border-2" style={{borderColor: '#4FC3F7'}}>
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Cadastro de Empresa</h1>
-          <p className="text-gray-600">Preencha os dados da sua empresa para começar</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 p-2 xs:p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg xs:max-w-xl md:max-w-2xl p-4 xs:p-6 md:p-8 border-2" style={{borderColor: '#4FC3F7'}}>
+        <div className="text-center mb-6 xs:mb-8">
+          <h1 className="text-xl xs:text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Cadastro de Empresa</h1>
+          <p className="text-gray-600 text-sm xs:text-base">Preencha os dados da sua empresa para começar</p>
         </div>
         
         {mensagem && (

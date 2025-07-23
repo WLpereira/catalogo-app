@@ -395,178 +395,51 @@ export default function PainelEmpresa() {
             {mensagem && <p className="mt-2 text-center text-[#039BE5] font-semibold">{mensagem}</p>}
           </form>
           <h3 className="text-xl font-bold text-[#039BE5] mb-4">Produtos Cadastrados</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
             {produtos.length === 0 && <p className="text-gray-500 col-span-full">Nenhum produto cadastrado ainda.</p>}
             {produtos.map((produto) => (
               <div key={produto.id} className="bg-white border-2 border-[#B3E5FC] rounded-xl shadow p-3 sm:p-4 flex flex-col items-center">
                 {produto.imagem_url && (
                   <img src={produto.imagem_url} alt={produto.nome} className="w-20 h-20 sm:w-24 sm:h-24 object-contain mb-2 rounded" />
                 )}
-                <h4 className="text-base sm:text-lg font-bold text-[#039BE5] mb-1 text-center break-words">{produto.nome}</h4>
-                <p className="text-[#4FC3F7] font-bold mb-1 text-center">R$ {produto.preco?.toFixed(2)}</p>
-                <p className="text-gray-700 text-xs sm:text-sm mb-1 text-center break-words">{produto.descricao}</p>
-                <span className="text-xs text-gray-400">{new Date(produto.created_at).toLocaleString()}</span>
-                <div className="flex flex-col sm:flex-row gap-2 mt-2 w-full justify-center">
-                  <button
-                    className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded text-xs sm:text-sm font-bold transition-all duration-200 w-full sm:w-auto"
-                    onClick={() => handleExcluirProduto(produto.id)}
-                    disabled={loadingProduto}
-                  >
-                    Excluir
-                  </button>
-                  <button
-                    className="bg-[#4FC3F7] hover:bg-[#039BE5] text-white px-3 py-1 rounded text-xs sm:text-sm font-bold transition-all duration-200 w-full sm:w-auto"
-                    onClick={() => abrirModalEditar(produto)}
-                    disabled={loadingProduto}
-                  >
-                    Editar
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-col md:flex-row gap-4 justify-center mt-8">
-            <button
-              className="bg-gradient-to-r from-[#4FC3F7] to-[#039BE5] text-white p-3 rounded-lg font-bold text-lg shadow-lg hover:from-[#039BE5] hover:to-[#4FC3F7] transition-all duration-200"
-              onClick={() => router.push('/')}
-            >
-              Voltar para Home
-            </button>
-          </div>
-        </div>
-      </div>
-      {/* Modal de edição de produto */}
-      {/* Modal de Personalização */}
-      {mostrarPersonalizacao && empresa && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <PersonalizacaoLoja
-              empresaId={empresa.id}
-              onClose={() => setMostrarPersonalizacao(false)}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Modal de Edição de Produto */}
-      {produtoEditando && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl border-2 relative animate-fadeIn" style={{ borderColor: '#29B6F6', maxHeight: '90vh', overflowY: 'auto' }}>
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-red-600 text-2xl font-bold z-10" onClick={fecharModalEditar}>&times;</button>
-            <h3 className="text-2xl font-extrabold text-[#039BE5] mb-6 text-center">Editar Produto</h3>
-            
-            <ProductForm
-              initialData={{
-                id: produtoEditando.id,
-                nome: editNome,
-                descricao: editDescricao,
-                preco: editPreco,
-                imagem_url: editImagemUrl
-              }}
-              onSubmit={async (data: { nome: string; descricao: string; preco: string; imagem: File | null }) => {
-                try {
-                  setLoadingEditar(true);
-                  
-                  // 1. Upload da nova imagem se houver
-                  let novaImagemUrl = editImagemUrl;
-                  if (data.imagem) {
-                    const fileExt = data.imagem.name.split('.').pop();
-                    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-                    const filePath = `produtos/${fileName}`;
-                    
-                    const { error: uploadError } = await supabase.storage
-                      .from('produtos')
-                      .upload(filePath, data.imagem);
-                      
-                    if (uploadError) throw uploadError;
-                    
-                    // Obter URL pública da nova imagem
-                    const { data: { publicUrl } } = supabase.storage
-                      .from('produtos')
-                      .getPublicUrl(filePath);
-                      
-                    novaImagemUrl = publicUrl;
-                  }
-                  
-                  // 2. Atualizar os dados do produto
-                  // Converter o preço do formato brasileiro para o formato numérico
-                  const precoNumerico = parseFloat(data.preco.replace(',', '.'));
-                  
-                  const updateData: any = {
-                    nome: data.nome,
-                    descricao: data.descricao,
-                    preco: precoNumerico,
-                    ...(novaImagemUrl && { imagem_url: novaImagemUrl })
-                  };
-                  
-                  const { error } = await supabase
-                    .from('produtos')
-                    .update(updateData)
-                    .eq('id', produtoEditando.id);
-                    
-                  if (error) throw error;
-                  
-                  // 3. Atualizar a lista de produtos
-                  const updatedProdutos = produtos.map(p => 
-                    p.id === produtoEditando.id 
-                      ? { 
-                          ...p, 
-                          nome: data.nome, 
-                          descricao: data.descricao, 
-                          preco: parseFloat(data.preco),
-                          ...(novaImagemUrl && { imagem_url: novaImagemUrl })
-                        } 
-                      : p
-                  );
-                  setProdutos(updatedProdutos);
-                  
-                  // 4. Fechar o modal e mostrar mensagem de sucesso
-                  setMensagem("Produto atualizado com sucesso!");
-                  fecharModalEditar();
-                  
-                } catch (error) {
-                  console.error("Erro ao atualizar produto:", error);
-                  setMensagem("Erro ao atualizar produto: " + (error as Error).message);
-                } finally {
-                  setLoadingEditar(false);
-                }
-              }}
-              isSubmitting={loadingEditar}
-              title=""
-              submitButtonText={loadingEditar ? "Salvando..." : "Salvar Alterações"}
-            />
+{{ ... }}
           </div>
         </div>
       )}
       {/* Modal de edição da empresa */}
       {editandoEmpresa && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl border-2 border-[#4FC3F7] relative animate-fadeIn flex flex-col" style={{ maxHeight: '90vh' }}>
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-red-600 text-2xl font-bold z-10" onClick={fecharModalEditarEmpresa}>&times;</button>
-            <h3 className="text-2xl font-extrabold text-[#039BE5] mb-6 text-center">Editar Empresa</h3>
-            <form className="flex flex-col gap-4 flex-1 overflow-y-auto pr-2" style={{ minHeight: 0 }} onSubmit={handleSalvarEmpresa}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-base font-semibold text-[#039BE5] mb-1">Nome</label>
-                  <input type="text" className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:ring-2 focus:ring-[#4FC3F7] text-black placeholder-[#B3E5FC]" value={empresaNome} onChange={e => setEmpresaNome(e.target.value)} required placeholder="Nome da empresa" />
-                </div>
-                <div>
-                  <label className="block text-base font-semibold text-[#039BE5] mb-1">CNPJ</label>
-                  <IMaskInput
-                    mask="00.000.000/0000-00"
-                    value={empresaCnpj}
-                    onAccept={(value) => setEmpresaCnpj(String(value))}
-                    placeholder="CNPJ"
-                    className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:ring-2 focus:ring-[#4FC3F7] text-black placeholder-[#B3E5FC]"
-                  />
-                </div>
-                <div>
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2 xs:p-4">
+          <div className="bg-white rounded-2xl p-4 xs:p-6 sm:p-8 w-full max-w-md shadow-2xl border border-gray-200 relative">
+            <button className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold transition-all duration-200" onClick={closeModalEdit}>&times;</button>
+            <h3 className="text-base xs:text-lg sm:text-xl font-bold mb-2 sm:mb-4" style={{color:'#039BE5'}}>Editar Produto</h3>
+            <div className="flex flex-col items-center mb-2 sm:mb-4">
+              {produtoEdit.imagem_url && (
+                <img src={produtoEdit.imagem_url} alt={produtoEdit.nome} className="w-20 h-20 xs:w-24 xs:h-24 object-contain mb-2 rounded" />
+              )}
+              <h4 className="text-base xs:text-lg font-bold text-black mb-1">{produtoEdit.nome}</h4>
+              <p className="font-bold mb-1" style={{color:'#039BE5'}}>R$ {produtoEdit.preco?.toFixed(2)}</p>
+              <p className="text-gray-700 text-xs xs:text-sm mb-1 text-center">{produtoEdit.descricao}</p>
+            </div>
+            <form onSubmit={handleEditProduto} className="flex flex-col gap-2 mb-2 sm:mb-4">
+              <label className="block text-sm xs:text-base font-semibold text-black mb-1">Nome</label>
+              <input type="text" value={editNome} onChange={e => setEditNome(e.target.value)} className="w-full p-2 xs:p-3 border rounded-lg focus:ring-2 text-black placeholder-gray-400" style={{borderColor:'#4FC3F7'}} required />
+              <label className="block text-sm xs:text-base font-semibold text-black mb-1">Preço</label>
+              <input type="number" value={editPreco} onChange={e => setEditPreco(Number(e.target.value))} className="w-full p-2 xs:p-3 border rounded-lg focus:ring-2 text-black placeholder-gray-400" style={{borderColor:'#4FC3F7'}} required />
+              <label className="block text-sm xs:text-base font-semibold text-black mb-1">Descrição</label>
+              <textarea value={editDescricao} onChange={e => setEditDescricao(e.target.value)} className="w-full p-2 xs:p-3 border rounded-lg focus:ring-2 text-black placeholder-gray-400" style={{borderColor:'#4FC3F7'}} rows={2} required />
+              <button type="submit" className="w-full text-white p-2 xs:p-3 rounded-lg font-bold text-base xs:text-lg shadow-lg transition-all duration-200 mt-2" style={{background:'linear-gradient(90deg, #4FC3F7 0%, #29B6F6 100%)'}}>Salvar Alterações</button>
+            </form>
+            <button className="w-full mt-2 bg-black text-white p-2 xs:p-3 rounded-lg font-bold text-base xs:text-lg shadow-lg hover:bg-blue-400 transition-all duration-200" onClick={closeModalEdit}>
+              Cancelar
+            </button>
+          </div>
+        </div>
                   <label className="block text-base font-semibold text-[#039BE5] mb-1">E-mail</label>
                   <input type="email" className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:ring-2 focus:ring-[#4FC3F7] text-black placeholder-[#B3E5FC]" value={empresaEmail} onChange={e => setEmpresaEmail(e.target.value)} required placeholder="E-mail" />
                 </div>
                 <div>
                   <label className="block text-base font-semibold text-[#039BE5] mb-1">Telefone</label>
-                  <IMaskInput
+{{ ... }}
                     mask="(00) 00000-0000"
                     value={empresaTelefone}
                     onAccept={(value) => setEmpresaTelefone(String(value))}

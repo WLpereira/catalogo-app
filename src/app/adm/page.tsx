@@ -100,8 +100,17 @@ export default function PainelADM() {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg xs:max-w-xl md:max-w-2xl p-4 xs:p-6 md:p-8 border-2" style={{borderColor: '#4FC3F7'}}>
         <div className="text-center mb-6 xs:mb-8">
           <h1 className="text-xl xs:text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Painel Administrativo</h1>
-          <p className="text-gray-600 text-sm xs:text-base">Gerencie o carrossel e campanhas do site</p>
-                <h2 className="text-xl font-bold" style={{color:'#039BE5'}}>Carrossel (máx. 5)</h2>
+          <p className="text-gray-600 text-sm xs:text-base mb-6">Gerencie o carrossel e campanhas do site</p>
+          
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Carregando...</p>
+            </div>
+          ) : (
+            <>
+              <section className="mb-8">
+                <h2 className="text-xl font-bold mb-4" style={{color:'#039BE5'}}>Carrossel (máx. 5)</h2>
                 <div className="flex gap-4 flex-wrap mb-4">
                   {carrossel.map((img, idx) => (
                     <div key={img.id} className="bg-white border-2 rounded-xl shadow-lg p-4 flex flex-col items-center" style={{borderColor:'#4FC3F7'}}>
@@ -121,9 +130,9 @@ export default function PainelADM() {
               </section>
               {/* Campanhas */}
               <section>
-                <h2 className="text-xl font-bold" style={{color:'#039BE5'}}>Campanhas (máx. 10)</h2>
+                <h2 className="text-xl font-bold mb-4" style={{color:'#039BE5'}}>Campanhas (máx. 10)</h2>
                 <div className="flex gap-4 flex-wrap mb-4">
-                  {campanhas.map((img, idx) => (
+                  {campanhas.map((img) => (
                     <div key={img.id} className="bg-white border-2 rounded-xl shadow-lg p-4 flex flex-col items-center" style={{borderColor:'#4FC3F7'}}>
                       <img src={img.url} alt="Campanha" className="w-32 h-32 object-contain mb-2 rounded" />
                       <span className="text-sm font-bold mb-2 text-black">Ordem: {img.ordem}</span>
@@ -143,6 +152,13 @@ export default function PainelADM() {
                   )}
                 </div>
               </section>
+              
+              {/* Mensagem de feedback */}
+              {mensagem && (
+                <div className="mt-4 p-3 rounded-lg bg-blue-100 text-blue-800 text-sm">
+                  {mensagem}
+                </div>
+              )}
             </>
           )}
         </div>

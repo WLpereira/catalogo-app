@@ -304,7 +304,8 @@ export default function PainelEmpresa() {
     setLoadingProduto(false);
     if (error) {
       setMensagem('Erro ao excluir produto: ' + error.message);
-    } else {
+      {/* Modal de edição da empresa */}
+      {/* Fim do bloco de edição principal. */}
       setMensagem('Produto excluído com sucesso!');
       // Atualiza lista
       const { data } = await supabase.from('produtos').select('*').eq('empresa_id', empresa.id).order('created_at', { ascending: false });
@@ -370,7 +371,7 @@ export default function PainelEmpresa() {
                   placeholder="R$ 0,00"
                   defaultValue={0}
                   decimalsLimit={2}
-                  decimalSeparator=","
+                  decimalSeparator="," 
                   groupSeparator="."
                   prefix="R$ "
                   className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4FC3F7] bg-white text-black placeholder-[#B3E5FC]"
@@ -402,165 +403,230 @@ export default function PainelEmpresa() {
                 {produto.imagem_url && (
                   <img src={produto.imagem_url} alt={produto.nome} className="w-20 h-20 sm:w-24 sm:h-24 object-contain mb-2 rounded" />
                 )}
-{{ ... }}
+                <h3 className="font-bold text-center text-gray-800 mb-1">{produto.nome}</h3>
+                <p className="text-[#039BE5] font-bold mb-2">R$ {produto.preco.toFixed(2).replace('.', ',')}</p>
+                <div className="flex gap-2 mt-auto">
+                  <button 
+                    onClick={() => abrirModalEditar(produto)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-600 transition-colors"
+                  >
+                    Editar
+                  </button>
+                  <button 
+                    onClick={() => handleExcluirProduto(produto.id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600 transition-colors"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      )}
       {/* Modal de edição da empresa */}
       {editandoEmpresa && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2 xs:p-4">
           <div className="bg-white rounded-2xl p-4 xs:p-6 sm:p-8 w-full max-w-md shadow-2xl border border-gray-200 relative">
-            <button className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold transition-all duration-200" onClick={closeModalEdit}>&times;</button>
-            <h3 className="text-base xs:text-lg sm:text-xl font-bold mb-2 sm:mb-4" style={{color:'#039BE5'}}>Editar Produto</h3>
-            <div className="flex flex-col items-center mb-2 sm:mb-4">
-              {produtoEdit.imagem_url && (
-                <img src={produtoEdit.imagem_url} alt={produtoEdit.nome} className="w-20 h-20 xs:w-24 xs:h-24 object-contain mb-2 rounded" />
-              )}
-              <h4 className="text-base xs:text-lg font-bold text-black mb-1">{produtoEdit.nome}</h4>
-              <p className="font-bold mb-1" style={{color:'#039BE5'}}>R$ {produtoEdit.preco?.toFixed(2)}</p>
-              <p className="text-gray-700 text-xs xs:text-sm mb-1 text-center">{produtoEdit.descricao}</p>
-            </div>
-            <form onSubmit={handleEditProduto} className="flex flex-col gap-2 mb-2 sm:mb-4">
-              <label className="block text-sm xs:text-base font-semibold text-black mb-1">Nome</label>
-              <input type="text" value={editNome} onChange={e => setEditNome(e.target.value)} className="w-full p-2 xs:p-3 border rounded-lg focus:ring-2 text-black placeholder-gray-400" style={{borderColor:'#4FC3F7'}} required />
-              <label className="block text-sm xs:text-base font-semibold text-black mb-1">Preço</label>
-              <input type="number" value={editPreco} onChange={e => setEditPreco(Number(e.target.value))} className="w-full p-2 xs:p-3 border rounded-lg focus:ring-2 text-black placeholder-gray-400" style={{borderColor:'#4FC3F7'}} required />
-              <label className="block text-sm xs:text-base font-semibold text-black mb-1">Descrição</label>
-              <textarea value={editDescricao} onChange={e => setEditDescricao(e.target.value)} className="w-full p-2 xs:p-3 border rounded-lg focus:ring-2 text-black placeholder-gray-400" style={{borderColor:'#4FC3F7'}} rows={2} required />
-              <button type="submit" className="w-full text-white p-2 xs:p-3 rounded-lg font-bold text-base xs:text-lg shadow-lg transition-all duration-200 mt-2" style={{background:'linear-gradient(90deg, #4FC3F7 0%, #29B6F6 100%)'}}>Salvar Alterações</button>
-            </form>
-            <button className="w-full mt-2 bg-black text-white p-2 xs:p-3 rounded-lg font-bold text-base xs:text-lg shadow-lg hover:bg-blue-400 transition-all duration-200" onClick={closeModalEdit}>
-              Cancelar
-            </button>
-          </div>
-        </div>
-                  <label className="block text-base font-semibold text-[#039BE5] mb-1">E-mail</label>
-                  <input type="email" className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:ring-2 focus:ring-[#4FC3F7] text-black placeholder-[#B3E5FC]" value={empresaEmail} onChange={e => setEmpresaEmail(e.target.value)} required placeholder="E-mail" />
+            <button className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold transition-all duration-200" onClick={fecharModalEditarEmpresa}>&times;</button>
+            <h3 className="text-base xs:text-lg sm:text-xl font-bold mb-2 sm:mb-4" style={{color:'#039BE5'}}>Editar Empresa</h3>
+            
+            <form onSubmit={handleSalvarEmpresa} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Logo</label>
+                <div className="flex items-center gap-4 mb-4">
+                  {empresaLogoUrl && !empresaLogoFile && (
+                    <img src={empresaLogoUrl} alt="Logo da empresa" className="h-20 w-20 object-contain rounded-lg border border-gray-300" />
+                  )}
+                  {empresaLogoFile && (
+                    <img src={URL.createObjectURL(empresaLogoFile)} alt="Nova logo" className="h-20 w-20 object-contain rounded-lg border border-gray-300" />
+                  )}
+                  <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+                    Alterar Logo
+                    <input type="file" accept="image/*" className="hidden" onChange={handleEmpresaLogoChange} />
+                  </label>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Empresa</label>
+                  <input 
+                    type="text" 
+                    value={empresaNome} 
+                    onChange={e => setEmpresaNome(e.target.value)} 
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                    required 
+                  />
                 </div>
                 <div>
-                  <label className="block text-base font-semibold text-[#039BE5] mb-1">Telefone</label>
-{{ ... }}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">CNPJ</label>
+                  <IMaskInput
+                    mask="00.000.000/0000-00"
+                    value={empresaCnpj}
+                    onAccept={(value) => setEmpresaCnpj(String(value))}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                  <input 
+                    type="email" 
+                    value={empresaEmail} 
+                    onChange={e => setEmpresaEmail(e.target.value)} 
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                  <IMaskInput
                     mask="(00) 00000-0000"
                     value={empresaTelefone}
                     onAccept={(value) => setEmpresaTelefone(String(value))}
-                    placeholder="Telefone"
-                    className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:ring-2 focus:ring-[#4FC3F7] text-black placeholder-[#B3E5FC]"
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="(00) 00000-0000"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-base font-semibold text-[#039BE5] mb-1">Endereço</label>
-                  <input type="text" className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:ring-2 focus:ring-[#4FC3F7] text-black placeholder-[#B3E5FC]" value={empresaEndereco} onChange={e => setEmpresaEndereco(e.target.value)} placeholder="Endereço completo" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Endereço</label>
+                  <input 
+                    type="text" 
+                    value={empresaEndereco} 
+                    onChange={e => setEmpresaEndereco(e.target.value)} 
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                    placeholder="Endereço completo"
+                  />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-base font-semibold text-[#039BE5] mb-1">WhatsApp</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp</label>
                   <IMaskInput
                     mask="(00) 00000-0000"
                     value={empresaWhatsapp}
                     onAccept={(value) => setEmpresaWhatsapp(String(value))}
-                    placeholder="WhatsApp"
-                    className="w-full p-3 border border-[#B3E5FC] rounded-lg focus:ring-2 focus:ring-[#4FC3F7] text-black placeholder-[#B3E5FC]"
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="(00) 00000-0000"
                   />
                 </div>
-                <div>
-                  <label className="block text-base font-semibold text-[#039BE5] mb-1">Horário de Atendimento</label>
-                  <textarea
-                    className="w-full p-3 border border-[#B3E5FC] rounded-lg text-black placeholder-[#B3E5FC] shadow-sm"
-                    value={empresaHorario}
-                    onChange={e => setEmpresaHorario(e.target.value)}
-                    placeholder="Ex: Seg a Sex: 09:00 - 18:00\nSábado: 09:00 - 12:00\nDomingo: Fechado"
-                    rows={3}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Horário de Atendimento</label>
+                  <input 
+                    type="text" 
+                    value={empresaHorario} 
+                    onChange={e => setEmpresaHorario(e.target.value)} 
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                    placeholder="Ex: Segunda a Sexta, 08:00 às 18:00"
                   />
                 </div>
-                <div>
-                  <label className="block text-base font-semibold text-[#039BE5] mb-1">Sobre Nós</label>
-                  <textarea
-                    className="w-full p-3 border border-[#B3E5FC] rounded-lg text-black placeholder-[#B3E5FC] shadow-sm"
-                    value={empresaSobre}
-                    onChange={e => setEmpresaSobre(e.target.value)}
-                    placeholder="Conte um pouco sobre sua empresa, missão, valores, etc."
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Sobre a Empresa</label>
+                  <textarea 
+                    value={empresaSobre} 
+                    onChange={e => setEmpresaSobre(e.target.value)} 
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                     rows={3}
+                    placeholder="Fale um pouco sobre sua empresa..."
                   />
                 </div>
               </div>
-              <button type="button" className="mt-2 mb-2 text-[#039BE5] font-semibold underline" onClick={() => setMostrarExtras(!mostrarExtras)}>
-                {mostrarExtras ? 'Ocultar usuários extras' : 'Adicionar usuário extra'}
-              </button>
-              {mostrarExtras && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4 mb-4">
-                  <div>
-                    <label className="block text-base font-semibold text-[#039BE5] mb-1">Usuário Extra 1</label>
-                    <input type="text" className="w-full p-3 border border-[#B3E5FC] rounded-lg text-black placeholder-[#B3E5FC]" value={usuarioExtra1} onChange={e => setUsuarioExtra1(e.target.value)} placeholder="Usuário extra 1" />
-                  </div>
-                  <div>
-                    <label className="block text-base font-semibold text-[#039BE5] mb-1">Senha Extra 1</label>
-                    <div className="relative">
-                      <input type={mostrarSenhaExtra1 ? "text" : "password"} className="w-full p-3 border border-[#B3E5FC] rounded-lg text-black placeholder-[#B3E5FC] pr-12" value={senhaExtra1} onChange={e => setSenhaExtra1(e.target.value)} placeholder="Senha extra 1" />
-                      <button type="button" tabIndex={-1} onClick={() => setMostrarSenhaExtra1(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4FC3F7] hover:text-[#039BE5] focus:outline-none" aria-label={mostrarSenhaExtra1 ? "Ocultar senha" : "Mostrar senha"}>
-                        {mostrarSenhaExtra1 ? (
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12.001C3.226 16.273 7.322 19.5 12 19.5c1.658 0 3.237-.336 4.646-.94M21.065 11.999a10.45 10.45 0 00-2.032-3.775M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18" />
-                          </svg>
-                        ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12C3.5 7.5 7.5 4.5 12 4.5c4.5 0 8.5 3 9.75 7.5-1.25 4.5-5.25 7.5-9.75 7.5-4.5 0-8.5-3-9.75-7.5z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                        )}
-                      </button>
+
+              <div className="mt-4">
+                <button 
+                  type="button" 
+                  onClick={() => setMostrarExtras(!mostrarExtras)}
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium mb-2 flex items-center"
+                >
+                  {mostrarExtras ? 'Ocultar' : 'Mostrar'} usuários adicionais
+                  <svg 
+                    className={`ml-1 w-4 h-4 transition-transform ${mostrarExtras ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M19 9l-7 7-7-7" 
+                    />
+                  </svg>
+                </button>
+
+                {mostrarExtras && (
+                  <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h4 className="font-medium text-gray-700">Usuários Adicionais</h4>
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((num) => (
+                        <div key={num} className="space-y-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Usuário {num}</label>
+                              <input
+                                type="text"
+                                value={eval(`usuarioExtra${num}`) || ''}
+                                onChange={(e) => eval(`setUsuarioExtra${num}(e.target.value)`)}
+                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                placeholder={`E-mail do usuário ${num}`}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                              <div className="relative">
+                                <input
+                                  type={eval(`mostrarSenhaExtra${num}`) ? 'text' : 'password'}
+                                  value={eval(`senhaExtra${num}`) || ''}
+                                  onChange={(e) => eval(`setSenhaExtra${num}(e.target.value)`)}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm pr-10"
+                                  placeholder={`Senha do usuário ${num}`}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => eval(`setMostrarSenhaExtra${num}(!mostrarSenhaExtra${num})`)}
+                                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+                                >
+                                  {eval(`mostrarSenhaExtra${num}`) ? (
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                    </svg>
+                                  ) : (
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-base font-semibold text-[#039BE5] mb-1">Usuário Extra 2</label>
-                    <input type="text" className="w-full p-3 border border-[#B3E5FC] rounded-lg text-black placeholder-[#B3E5FC]" value={usuarioExtra2} onChange={e => setUsuarioExtra2(e.target.value)} placeholder="Usuário extra 2" />
-                  </div>
-                  <div>
-                    <label className="block text-base font-semibold text-[#039BE5] mb-1">Senha Extra 2</label>
-                    <div className="relative">
-                      <input type={mostrarSenhaExtra2 ? "text" : "password"} className="w-full p-3 border border-[#B3E5FC] rounded-lg text-black placeholder-[#B3E5FC] pr-12" value={senhaExtra2} onChange={e => setSenhaExtra2(e.target.value)} placeholder="Senha extra 2" />
-                      <button type="button" tabIndex={-1} onClick={() => setMostrarSenhaExtra2(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4FC3F7] hover:text-[#039BE5] focus:outline-none" aria-label={mostrarSenhaExtra2 ? "Ocultar senha" : "Mostrar senha"}>
-                        {mostrarSenhaExtra2 ? (
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12.001C3.226 16.273 7.322 19.5 12 19.5c1.658 0 3.237-.336 4.646-.94M21.065 11.999a10.45 10.45 0 00-2.032-3.775M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18" />
-                          </svg>
-                        ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12C3.5 7.5 7.5 4.5 12 4.5c4.5 0 8.5 3 9.75 7.5-1.25 4.5-5.25 7.5-9.75 7.5-4.5 0-8.5-3-9.75-7.5z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-base font-semibold text-[#039BE5] mb-1">Usuário Extra 3</label>
-                    <input type="text" className="w-full p-3 border border-[#B3E5FC] rounded-lg text-black placeholder-[#B3E5FC]" value={usuarioExtra3} onChange={e => setUsuarioExtra3(e.target.value)} placeholder="Usuário extra 3" />
-                  </div>
-                  <div>
-                    <label className="block text-base font-semibold text-[#039BE5] mb-1">Senha Extra 3</label>
-                    <div className="relative">
-                      <input type={mostrarSenhaExtra3 ? "text" : "password"} className="w-full p-3 border border-[#B3E5FC] rounded-lg text-black placeholder-[#B3E5FC] pr-12" value={senhaExtra3} onChange={e => setSenhaExtra3(e.target.value)} placeholder="Senha extra 3" />
-                      <button type="button" tabIndex={-1} onClick={() => setMostrarSenhaExtra3(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4FC3F7] hover:text-[#039BE5] focus:outline-none" aria-label={mostrarSenhaExtra3 ? "Ocultar senha" : "Mostrar senha"}>
-                        {mostrarSenhaExtra3 ? (
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12.001C3.226 16.273 7.322 19.5 12 19.5c1.658 0 3.237-.336 4.646-.94M21.065 11.999a10.45 10.45 0 00-2.032-3.775M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18" />
-                          </svg>
-                        ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12C3.5 7.5 7.5 4.5 12 4.5c4.5 0 8.5 3 9.75 7.5-1.25 4.5-5.25 7.5-9.75 7.5-4.5 0-8.5-3-9.75-7.5z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div className="sticky bottom-0 bg-white pt-4 pb-2 z-10">
-                <button type="submit" disabled={loadingEmpresa} className="w-full bg-gradient-to-r from-blue-700 to-blue-500 text-white p-3 rounded-lg font-bold text-lg shadow-lg hover:from-blue-800 hover:to-blue-600 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed mt-2">
-                  {loadingEmpresa ? "Salvando..." : "Salvar Alterações"}
+                )}
+              </div>
+
+              <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={fecharModalEditarEmpresa}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={loadingEmpresa}
+                  className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors flex justify-center items-center"
+                >
+                  {loadingEmpresa ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Salvando...
+                    </>
+                  ) : 'Salvar Alterações'}
                 </button>
               </div>
             </form>
@@ -568,5 +634,6 @@ export default function PainelEmpresa() {
         </div>
       )}
     </div>
-  );
+  </div>
+);
 }

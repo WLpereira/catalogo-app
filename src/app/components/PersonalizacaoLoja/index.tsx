@@ -151,20 +151,29 @@ export default function PersonalizacaoLoja({ empresaId, onClose }: Personalizaca
         <div>
           <h3 className="text-lg font-semibold mb-3 text-black">Banner da Loja</h3>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-black mb-2">
-              Adicionar Imagens do Banner
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleBannerChange}
-              className="block w-full text-sm text-gray-800
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-md file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                hover:file:bg-blue-100"
-            />
+            {bannerPreviews.length === 0 ? (
+              <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-black px-4 py-2 rounded-lg transition-colors border border-gray-300 font-medium inline-block mb-2">
+                Adicionar Imagem
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleBannerChange}
+                  className="hidden"
+                />
+              </label>
+            ) : (
+              <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-black px-4 py-2 rounded-lg transition-colors border border-gray-300 font-medium inline-block mb-2">
+                Alterar Imagem
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleBannerChange}
+                  className="hidden"
+                />
+              </label>
+            )}
           </div>
           
           {/* Pré-visualização dos banners */}

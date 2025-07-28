@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSearch } from '@/app/contexts/SearchContext';
@@ -19,6 +19,7 @@ export default function EmpresaPage() {
   const [loading, setLoading] = useState(true);
   const [corPrimaria, setCorPrimaria] = useState('#29B6F6');
   const [corSecundaria, setCorSecundaria] = useState('#4FC3F7');
+  const [ordenacao, setOrdenacao] = useState<'nome' | 'preco_asc' | 'preco_desc'>('nome');
   
   // Função para formatar o preço em reais    R$
   const formatarPreco = (valor: number) => {
@@ -58,6 +59,15 @@ export default function EmpresaPage() {
     p.nome.toLowerCase().includes(busca.toLowerCase()) ||
     p.descricao?.toLowerCase().includes(busca.toLowerCase())
   );
+
+  const produtosOrdenados = useMemo(() => {
+    return [...produtosFiltrados].sort((a, b) => {
+      if (ordenacao === 'nome') return a.nome.localeCompare(b.nome);
+      if (ordenacao === 'preco_asc') return (a.preco || 0) - (b.preco || 0);
+      if (ordenacao === 'preco_desc') return (b.preco || 0) - (a.preco || 0);
+      return 0;
+    });
+  }, [produtosFiltrados, ordenacao]);
 
   const router = useRouter();
 
@@ -139,12 +149,29 @@ export default function EmpresaPage() {
           </div>
           <main className="flex-1 w-full py-6 px-1 xs:px-2 sm:px-4 md:px-8">
             <div className="max-w-7xl mx-auto">
-              <h2 className="text-2xl font-bold mb-8 text-center tracking-tight" style={{ color: corSecundaria, letterSpacing: 1 }}>Produtos Disponíveis</h2>
-              {produtosFiltrados.length === 0 ? (
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+                <h2 className="text-2xl font-bold text-center sm:text-left tracking-tight" style={{ color: corSecundaria, letterSpacing: 1 }}>Produtos Disponíveis</h2>
+                <div className="flex flex-col">
+                  <label htmlFor="ordenacao" className="text-sm font-medium mb-1" style={{ color: corSecundaria }}>Ordenar por:</label>
+                  <select
+                    id="ordenacao"
+                    className="p-2 border-2 rounded-lg text-black bg-white font-semibold shadow focus:ring-2 transition-all duration-200 focus:outline-none focus:ring-2"
+                    value={ordenacao}
+                    onChange={e => setOrdenacao(e.target.value as 'nome' | 'preco_asc' | 'preco_desc')}
+                    style={{ minWidth: 220, borderColor: corSecundaria, color: corSecundaria, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+                    aria-label="Ordenar produtos por"
+                  >
+                    <option value="nome">Nome (A-Z)</option>
+                    <option value="preco_asc">Preço (menor para maior)</option>
+                    <option value="preco_desc">Preço (maior para menor)</option>
+                  </select>
+                </div>
+              </div>
+              {produtosOrdenados.length === 0 ? (
                 <p className="text-center text-gray-100/80 text-lg font-medium">Nenhum produto encontrado.</p>
               ) : (
                 <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                  {produtosFiltrados.map((produto) => (
+                  {produtosOrdenados.map((produto) => (
                     <div
                       key={produto.id}
                       className="bg-white/95 rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300 cursor-pointer flex flex-col h-full border-2 border-transparent hover:border-blue-200"

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 
@@ -18,10 +18,46 @@ interface Produto {
 export default function ProdutoPage() {
   const { id } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [produto, setProduto] = useState<Produto | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantidade, setQuantidade] = useState(1);
   const [produtosRelacionados, setProdutosRelacionados] = useState<Produto[]>([]);
+  const [corPrimaria, setCorPrimaria] = useState<string>('#29B6F6');
+  const [corSecundaria, setCorSecundaria] = useState<string>('#4FC3F7');
+  // Ao montar, pega as cores da query string se existirem
+  useEffect(() => {
+    const corP = searchParams.get('corPrimaria');
+    const corS = searchParams.get('corSecundaria');
+    if (corP && corP !== '') {
+      setCorPrimaria(corP);
+    }
+    if (corS && corS !== '') {
+      setCorSecundaria(corS);
+    }
+  }, [searchParams]);
+
+  // Se não houver cor na query, buscar do banco da empresa
+  useEffect(() => {
+    const corP = searchParams.get('corPrimaria');
+    const corS = searchParams.get('corSecundaria');
+    if ((!corP || corP === '') || (!corS || corS === '')) {
+      // Só busca se faltar alguma cor
+      const buscarCoresEmpresa = async () => {
+        if (!produto?.empresa_id) return;
+        const { data, error } = await supabase
+          .from('empresas')
+          .select('cor_primaria, cor_secundaria')
+          .eq('id', produto.empresa_id)
+          .single();
+        if (!error && data) {
+          if ((!corP || corP === '') && data.cor_primaria) setCorPrimaria(data.cor_primaria);
+          if ((!corS || corS === '') && data.cor_secundaria) setCorSecundaria(data.cor_secundaria);
+        }
+      };
+      buscarCoresEmpresa();
+    }
+  }, [produto, searchParams]);
 
   useEffect(() => {
     const carregarProduto = async () => {
@@ -87,11 +123,11 @@ export default function ProdutoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ background: corPrimaria }}>
       {/* Cabeçalho */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <Link href="/" className="text-blue-600 hover:underline">
+          <Link href="/" className="font-bold" style={{ color: corPrimaria }}>
             &larr; Voltar para a loja
           </Link>
         </div>
@@ -133,7 +169,7 @@ export default function ProdutoPage() {
               </h1>
               
               <div className="flex items-center mb-6">
-                <span className="text-3xl font-bold text-blue-600">
+                <span className="text-3xl font-bold" style={{ color: corPrimaria }}>
                   R$ {produto.preco?.toFixed(2).replace('.', ',')}
                 </span>
                 <span className="ml-2 text-sm text-gray-500">
@@ -146,8 +182,8 @@ export default function ProdutoPage() {
 
 
               <div className="space-y-3">
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                  <h3 className="font-semibold text-blue-800 mb-2">Descrição do Produto</h3>
+                <div className="mt-6 p-4 rounded-lg border" style={{ background: corSecundaria + '20', borderColor: corSecundaria }}>
+                  <h3 className="font-semibold mb-2" style={{ color: corSecundaria }}>Descrição do Produto</h3>
                   <p className="text-gray-800">{produto.descricao || 'Nenhuma descrição disponível.'}</p>
                 </div>
                 
@@ -225,7 +261,8 @@ export default function ProdutoPage() {
 
                 {/* Botão Ir para a Loja */}
                 <button 
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors mt-2"
+                  className="w-full font-bold py-3 px-6 rounded-lg transition-colors mt-2"
+                  style={{ background: corSecundaria, color: '#fff' }}
                   onClick={() => window.location.href = `/empresa/${produto.empresa_id}`}
                 >
                   Ir para a Loja
@@ -243,7 +280,10 @@ export default function ProdutoPage() {
               {produtosRelacionados.map((produto) => (
                 <div 
                   key={produto.id}
-                  onClick={() => router.push(`/produto/${produto.id}`)}
+                  onClick={() => {
+                    // Passa as cores atuais na URL ao navegar para outro produto
+                    router.push(`/produto/${produto.id}?corPrimaria=${encodeURIComponent(corPrimaria)}&corSecundaria=${encodeURIComponent(corSecundaria)}`);
+                  }}
                   className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <div className="h-40 bg-gray-100 flex items-center justify-center p-4">

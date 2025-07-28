@@ -248,8 +248,19 @@ export default function Home() {
   }, [setBusca]);
 
   const handleProdutoClick = useCallback((produtoId: string) => {
-    router.push(`/produto/${produtoId}`);
-  }, [router]);
+    // Busca o produto para pegar empresa_id
+    const produto = produtos.find(p => p.id === produtoId);
+    if (produto) {
+      // Busca empresa para pegar as cores
+      supabase.from('empresas').select('cor_primaria, cor_secundaria').eq('id', produto.empresa_id).single().then(({ data }) => {
+        const corPrimaria = data?.cor_primaria || '#29B6F6';
+        const corSecundaria = data?.cor_secundaria || '#4FC3F7';
+        router.push(`/produto/${produtoId}?corPrimaria=${encodeURIComponent(corPrimaria)}&corSecundaria=${encodeURIComponent(corSecundaria)}`);
+      });
+    } else {
+      router.push(`/produto/${produtoId}`);
+    }
+  }, [router, produtos]);
 
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);

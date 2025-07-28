@@ -175,9 +175,13 @@ export default function EmpresaPage() {
                     <div
                       key={produto.id}
                       className="bg-white/95 rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300 cursor-pointer flex flex-col h-full border-2 border-transparent hover:border-blue-200"
-                      onClick={() => setProdutoSelecionado(produto)}
+                      onClick={() => {
+                        // Redireciona para página de produto, passando as cores da empresa via query
+                        const url = `/produto/${produto.id}?corPrimaria=${encodeURIComponent(corPrimaria)}&corSecundaria=${encodeURIComponent(corSecundaria)}`;
+                        window.location.href = url;
+                      }}
                     >
-                      <div className="bg-white rounded-xl shadow-lg flex flex-col h-full cursor-pointer hover:scale-105 transition-transform duration-200 border border-gray-200 min-w-0" onClick={() => setProdutoSelecionado(produto)}>
+                      <div className="bg-white rounded-xl shadow-lg flex flex-col h-full cursor-pointer hover:scale-105 transition-transform duration-200 border border-gray-200 min-w-0">
                         <img
                           src={produto.imagem_url}
                           alt={produto.nome}
@@ -195,66 +199,7 @@ export default function EmpresaPage() {
               )}
             </div>
           </main>
-          {produtoSelecionado && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 xs:p-4">
-              <div className="bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
-                <div className="p-3 xs:p-4 sm:p-6">
-                  <div className="flex justify-between items-start mb-2 sm:mb-4">
-                    <h3 className="text-xl sm:text-2xl font-bold break-words" style={{ color: corPrimaria }}>{produtoSelecionado?.nome}</h3>
-                    <button
-                      onClick={() => setProdutoSelecionado(null)}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="mb-4 sm:mb-6">
-                    <img
-                      src={produtoSelecionado?.imagem_url ?? ''}
-                      alt={produtoSelecionado?.nome ?? ''}
-                      className="w-full h-40 xs:h-52 sm:h-64 object-contain mb-2 sm:mb-4"
-                    />
-                    <p className="text-gray-700 mb-2 sm:mb-4 text-xs xs:text-sm">{produtoSelecionado?.descricao}</p>
-                    <p className="text-lg sm:text-2xl font-bold mb-2 sm:mb-4" style={{ color: corSecundaria }}>
-                      {produtoSelecionado ? formatarPreco(produtoSelecionado.preco) : ''}
-                    </p>
-                    <div className="flex items-center mb-4 sm:mb-6 flex-wrap gap-2 xs:gap-4">
-                      <span className="mr-2 xs:mr-4">Quantidade:</span>
-                      <div className="flex items-center border rounded-md overflow-hidden">
-                        <button
-                          onClick={() => setQuantidade(Math.max(1, quantidade - 1))}
-                          className="px-2 xs:px-3 py-1 bg-gray-100 hover:bg-gray-200"
-                        >
-                          -
-                        </button>
-                        <span className="px-3 xs:px-4 py-1">{quantidade}</span>
-                        <button
-                          onClick={() => setQuantidade(quantidade + 1)}
-                          className="px-2 xs:px-3 py-1 bg-gray-100 hover:bg-gray-200"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                    <button
-                      className="w-full py-2 rounded-md text-white font-medium text-base xs:text-lg"
-                      style={{ backgroundColor: corPrimaria }}
-                      onClick={() => {
-                        const whatsappNumber = empresa?.whatsapp?.replace(/\D/g, '');
-                        const message = produtoSelecionado ? `Olá! Gostaria de comprar ${quantidade}x ${produtoSelecionado.nome} - ${formatarPreco(produtoSelecionado.preco * quantidade)}` : '';
-                        const url = `https://wa.me/55${whatsappNumber}?text=${encodeURIComponent(message)}`;
-                        window.open(url, '_blank');
-                      }}
-                    >
-                      Comprar Agora
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Modal removido: agora sempre redireciona para página de produto */}
           <Footer empresa={empresa} />
         </>
       ) : (

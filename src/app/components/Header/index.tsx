@@ -36,7 +36,7 @@ export default function Header({
 
   return (
     <header className="w-full bg-white text-black shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-2 xs:px-3 sm:px-4 py-2 sm:py-3">
+      <div className="max-w-[1800px] mx-auto px-2 xs:px-6 sm:px-10 py-2 sm:py-3">
         <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
           {/* Logo e botão voltar */}
           <div className="flex items-center gap-2 xs:gap-3 sm:gap-4 w-full md:w-auto min-w-0">

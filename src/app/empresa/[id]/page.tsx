@@ -66,8 +66,8 @@ export default function EmpresaPage() {
       {/* Navbar fixa topo */}
       {empresa && (
         <nav className="w-full fixed top-0 left-0 z-40 bg-white border-b border-gray-100 shadow-sm" style={{height:'64px'}}>
-          <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-8 h-16">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between px-2 sm:px-4 h-16 w-full">
+            <div className="flex items-center gap-3 min-w-0">
               <Link href="/" className="flex items-center">
                 {empresa.logo_url && (
                   <img
@@ -77,11 +77,12 @@ export default function EmpresaPage() {
                   />
                 )}
               </Link>
-              <span className="text-lg sm:text-xl md:text-2xl font-bold" style={{color: corPrimaria}}>{empresa.nome}</span>
+              <span className="text-lg sm:text-xl md:text-2xl font-bold truncate" style={{color: corPrimaria}}>{empresa.nome}</span>
             </div>
+            <div className="flex-1"></div>
             <button
               onClick={() => router.push('/empresa/login')}
-              className="bg-black text-white px-4 py-2 rounded-lg font-bold text-sm sm:text-base shadow hover:bg-blue-700 transition-colors"
+              className="bg-black text-white px-4 py-2 rounded-lg font-bold text-sm sm:text-base shadow hover:bg-blue-700 transition-colors ml-auto"
             >
               Área da Empresa
             </button>
@@ -99,12 +100,13 @@ export default function EmpresaPage() {
           {/* Cabeçalho da empresa dinâmica (removido, pois agora está na navbar) */}
           {/* Banner responsivo */}
           {empresa.banner_urls && empresa.banner_urls.length > 0 && (
-            <div className="w-full flex justify-center mt-4 px-1 sm:px-4">
-              <div className="w-full max-w-5xl h-28 xs:h-36 sm:h-44 md:h-56 rounded-xl overflow-hidden shadow-xl mb-6 border-4 border-white/80 flex justify-center items-center bg-white/10">
+            <div className="w-full flex justify-center mt-6 px-1 sm:px-4">
+              <div className="w-full max-w-[1800px] h-40 xs:h-56 sm:h-72 md:h-80 lg:h-[380px] rounded-2xl overflow-hidden shadow-2xl mb-8 border-4 border-white/80 flex justify-center items-center bg-gradient-to-r from-white/60 via-white/80 to-white/60">
                 <img
                   src={empresa.banner_urls[0]}
                   alt="Banner da loja"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-center"
+                  style={{minHeight:'180px', maxHeight:'420px'}}
                 />
               </div>
             </div>

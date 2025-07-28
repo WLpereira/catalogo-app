@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearch } from '@/app/contexts/SearchContext';
 import { supabase } from "@/lib/supabaseClient";
 import Footer from '@/app/components/Footer';
+import EmpresaNavbar from '@/app/components/EmpresaNavbar';
 import { Empresa, Produto } from '@/types/empresa';
 
 export default function EmpresaPage() {
@@ -69,35 +70,11 @@ export default function EmpresaPage() {
     });
   }, [produtosFiltrados, ordenacao]);
 
-  const router = useRouter();
-
   return (
     <div className="min-h-screen flex flex-col" style={{ background: corPrimaria, minHeight: '100vh' }}>
       {/* Navbar fixa topo */}
       {empresa && (
-        <nav className="w-full fixed top-0 left-0 z-40 bg-white border-b border-gray-100 shadow-sm" style={{height:'64px'}}>
-          <div className="flex items-center justify-between px-2 sm:px-4 h-16 w-full">
-            <div className="flex items-center gap-3 min-w-0">
-              <Link href="/" className="flex items-center">
-                {empresa.logo_url && (
-                  <img
-                    src={empresa.logo_url}
-                    alt={`Logo ${empresa.nome}`}
-                    className="h-10 w-10 sm:h-12 sm:w-12 object-contain rounded-full border border-gray-200 bg-white"
-                  />
-                )}
-              </Link>
-              <span className="text-lg sm:text-xl md:text-2xl font-bold truncate" style={{color: corPrimaria}}>{empresa.nome}</span>
-            </div>
-            <div className="flex-1"></div>
-            <button
-              onClick={() => router.push('/empresa/login')}
-              className="bg-black text-white px-4 py-2 rounded-lg font-bold text-sm sm:text-base shadow hover:bg-blue-700 transition-colors ml-auto"
-            >
-              Área da Empresa
-            </button>
-          </div>
-        </nav>
+        <EmpresaNavbar logoUrl={empresa.logo_url} nome={empresa.nome} corPrimaria={corPrimaria} />
       )}
       {/* Espaço para navbar fixa */}
       <div style={{height:'64px'}}></div>

@@ -29,8 +29,9 @@ export default function Header({
     setSearchQuery(e.target.value);
   };
 
-  // Não renderiza o header em rotas de empresa pública (/empresa/[id])
-  if (/^\/empresa\/[\w-]+$/.test(pathname)) {
+
+  // Não renderiza o header em rotas de empresa pública (/empresa/[id]) ou produto/[id], exceto login da empresa
+  if (/^\/(empresa|produto)\/[\w-]+$/.test(pathname) && pathname !== '/empresa/login') {
     return null;
   }
 

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
+import EmpresaNavbar from '@/app/components/EmpresaNavbar';
 
 interface Produto {
   id: string;
@@ -25,6 +26,9 @@ export default function ProdutoPage() {
   const [produtosRelacionados, setProdutosRelacionados] = useState<Produto[]>([]);
   const [corPrimaria, setCorPrimaria] = useState<string>('#29B6F6');
   const [corSecundaria, setCorSecundaria] = useState<string>('#4FC3F7');
+  // Estado para empresa (navbar)
+  const [empresaNav, setEmpresaNav] = useState<any>(null);
+
   // Ao montar, pega as cores da query string se existirem
   useEffect(() => {
     const corP = searchParams.get('corPrimaria');
@@ -100,6 +104,18 @@ export default function ProdutoPage() {
     }
   }, [id]);
 
+  // Busca os dados da empresa para a navbar
+  useEffect(() => {
+    if (produto?.empresa_id) {
+      supabase
+        .from('empresas')
+        .select('*')
+        .eq('id', produto.empresa_id)
+        .single()
+        .then(({ data }) => setEmpresaNav(data));
+    }
+  }, [produto?.empresa_id]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -124,6 +140,11 @@ export default function ProdutoPage() {
 
   return (
     <div className="min-h-screen" style={{ background: corPrimaria }}>
+      {/* Navbar personalizada igual empresa */}
+      {empresaNav && (
+        <EmpresaNavbar logoUrl={empresaNav.logo_url} nome={empresaNav.nome} corPrimaria={corPrimaria} />
+      )}
+      <div style={{height:'64px'}}></div>
       {/* Cabeçalho */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">

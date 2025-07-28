@@ -7,6 +7,7 @@ import ProductForm from "@/app/components/ProductForm";
 import { IMaskInput } from 'react-imask';
 import CurrencyInputField from 'react-currency-input-field';
 import dynamic from 'next/dynamic';
+import EmpresaNavbar from '@/app/components/EmpresaNavbar';
 
 // Carregar o componente de personalização dinamicamente para evitar problemas de SSR
 const PersonalizacaoLoja = dynamic(
@@ -324,6 +325,9 @@ export default function PainelEmpresa() {
 
   return (
     <>
+      {/* Navbar personalizada da empresa */}
+      <EmpresaNavbar logoUrl={empresa.logo_url} nome={empresa.nome} corPrimaria={empresa.cor_primaria || '#29B6F6'} />
+      <div style={{height:'64px'}}></div>
       {/* Modal de Personalização da Loja */}
       {mostrarPersonalizacao && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-2 xs:p-4">

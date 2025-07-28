@@ -173,7 +173,7 @@ export default function ProdutoPage() {
                   R$ {produto.preco?.toFixed(2).replace('.', ',')}
                 </span>
                 <span className="ml-2 text-sm text-gray-500">
-                  em até 12x sem juros
+                  
                 </span>
               </div>
 
@@ -274,8 +274,8 @@ export default function ProdutoPage() {
 
         {/* Produtos relacionados */}
         {produtosRelacionados.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Quem viu este item também viu</h2>
+          <div className="mt-12 p-6 rounded-xl bg-white">
+            <h2 className="text-2xl font-bold mb-6" style={{ color: corSecundaria }}>Quem viu este item também viu</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {produtosRelacionados.map((produto) => (
                 <div 
@@ -305,7 +305,7 @@ export default function ProdutoPage() {
                       R$ {produto.preco?.toFixed(2).replace('.', ',')}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      em até 12x sem juros
+                     
                     </p>
                   </div>
                 </div>

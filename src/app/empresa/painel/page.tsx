@@ -304,8 +304,7 @@ export default function PainelEmpresa() {
     setLoadingProduto(false);
     if (error) {
       setMensagem('Erro ao excluir produto: ' + error.message);
-      {/* Modal de edição da empresa */}
-      {/* Fim do bloco de edição principal. */}
+    } else {
       setMensagem('Produto excluído com sucesso!');
       // Atualiza lista
       const { data } = await supabase.from('produtos').select('*').eq('empresa_id', empresa.id).order('created_at', { ascending: false });
@@ -324,9 +323,69 @@ export default function PainelEmpresa() {
   if (!empresa) return null;
 
   return (
-    <div className="min-h-screen bg-white p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-2xl w-full p-6 md:p-8 border border-[#B3E5FC] mb-8">
+    <>
+      {/* Modal de Personalização da Loja */}
+      {mostrarPersonalizacao && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-2 xs:p-4">
+          <div className="relative w-full max-w-2xl mx-auto">
+            <PersonalizacaoLoja
+              empresaId={empresa.id}
+              onClose={() => setMostrarPersonalizacao(false)}
+            />
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold transition-all duration-200 z-10"
+              onClick={() => setMostrarPersonalizacao(false)}
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
+      {/* Modal de edição de produto */}
+      {produtoEditando && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2 xs:p-4">
+          <div className="bg-white rounded-2xl p-4 xs:p-6 sm:p-8 w-full max-w-md sm:max-w-lg md:max-w-xl shadow-2xl border border-gray-200 relative flex flex-col" style={{maxWidth:'95vw'}}>
+            <button className="absolute top-2 right-2 text-black hover:text-red-600 text-2xl font-bold transition-all duration-200" onClick={fecharModalEditar}>&times;</button>
+            <h3 className="text-base xs:text-lg sm:text-xl font-bold mb-2 sm:mb-4 text-black">Editar Produto</h3>
+            <form onSubmit={handleSalvarEdicaoProduto} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-sm font-medium text-black mb-1">Nome</label>
+                <input type="text" value={editNome} onChange={e => setEditNome(e.target.value)} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black" required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black mb-1">Descrição</label>
+                <textarea value={editDescricao} onChange={e => setEditDescricao(e.target.value)} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black" rows={2} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black mb-1">Preço</label>
+                <input type="text" value={editPreco} onChange={e => setEditPreco(e.target.value)} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black" required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black mb-1">Imagem</label>
+                <div className="flex items-center gap-4 flex-wrap">
+                  {editImagemUrl && !editImagemFile && (
+                    <img src={editImagemUrl} alt="Imagem do produto" className="h-20 w-20 object-contain rounded-lg border border-gray-300 mb-2" />
+                  )}
+                  {editImagemFile && (
+                    <img src={URL.createObjectURL(editImagemFile)} alt="Nova imagem" className="h-20 w-20 object-contain rounded-lg border border-gray-300 mb-2" />
+                  )}
+                  <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-black px-4 py-2 rounded-lg transition-colors border border-gray-300 font-medium">
+                    Alterar Imagem
+                    <input type="file" accept="image/*" onChange={handleEditImagemChange} className="hidden" />
+                  </label>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 mt-2">
+                <button type="button" onClick={fecharModalEditar} className="px-4 py-2 border border-gray-300 rounded-lg text-black bg-white hover:bg-gray-50">Cancelar</button>
+                <button type="submit" className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700">Salvar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      <div className="min-h-screen bg-white p-4 md:p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-2xl w-full p-6 md:p-8 border border-[#B3E5FC] mb-8">
           <h1 className="text-3xl font-extrabold mb-6 text-center text-black tracking-tight">Painel da Empresa</h1>
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 mb-8">
             {empresa.logo_url && (
@@ -403,7 +462,8 @@ export default function PainelEmpresa() {
                 {produto.imagem_url && (
                   <img src={produto.imagem_url} alt={produto.nome} className="w-20 h-20 sm:w-24 sm:h-24 object-contain mb-2 rounded" />
                 )}
-                <h3 className="font-bold text-center text-gray-800 mb-1">{produto.nome}</h3>
+                <h3 className="font-bold text-center text-black mb-1">{produto.nome}</h3>
+                <p className="text-black text-sm text-center mb-1 line-clamp-2 min-h-[32px]">{produto.descricao}</p>
                 <p className="text-[#039BE5] font-bold mb-2">R$ {produto.preco.toFixed(2).replace('.', ',')}</p>
                 <div className="flex gap-2 mt-auto">
                   <button 
@@ -426,186 +486,189 @@ export default function PainelEmpresa() {
       {/* Modal de edição da empresa */}
       {editandoEmpresa && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2 xs:p-4">
-          <div className="bg-white rounded-2xl p-4 xs:p-6 sm:p-8 w-full max-w-md shadow-2xl border border-gray-200 relative">
-            <button className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold transition-all duration-200" onClick={fecharModalEditarEmpresa}>&times;</button>
-            <h3 className="text-base xs:text-lg sm:text-xl font-bold mb-2 sm:mb-4" style={{color:'#039BE5'}}>Editar Empresa</h3>
-            
-            <form onSubmit={handleSalvarEmpresa} className="flex flex-col gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Logo</label>
-                <div className="flex items-center gap-4 mb-4">
-                  {empresaLogoUrl && !empresaLogoFile && (
-                    <img src={empresaLogoUrl} alt="Logo da empresa" className="h-20 w-20 object-contain rounded-lg border border-gray-300" />
-                  )}
-                  {empresaLogoFile && (
-                    <img src={URL.createObjectURL(empresaLogoFile)} alt="Nova logo" className="h-20 w-20 object-contain rounded-lg border border-gray-300" />
-                  )}
-                  <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
-                    Alterar Logo
-                    <input type="file" accept="image/*" className="hidden" onChange={handleEmpresaLogoChange} />
-                  </label>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white rounded-2xl p-0 xs:p-0 sm:p-0 w-full max-w-md sm:max-w-lg md:max-w-xl shadow-2xl border border-gray-200 relative flex flex-col" style={{maxWidth:'95vw', maxHeight:'100vh', height:'100vh'}}>
+            <button className="absolute top-2 right-2 text-black hover:text-red-600 text-2xl font-bold transition-all duration-200 z-20" onClick={fecharModalEditarEmpresa}>&times;</button>
+            <h3 className="text-base xs:text-lg sm:text-xl font-bold mb-2 sm:mb-4 text-[#039BE5] px-4 pt-6">Editar Empresa</h3>
+            <form onSubmit={handleSalvarEmpresa} className="flex flex-col flex-1 h-full">
+              <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-6" style={{maxHeight:'calc(100vh - 110px)', minHeight:0}}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Empresa</label>
-                  <input 
-                    type="text" 
-                    value={empresaNome} 
-                    onChange={e => setEmpresaNome(e.target.value)} 
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                    required 
-                  />
+                  <label className="block text-sm font-medium text-black mb-1">Logo</label>
+                  <div className="flex items-center gap-4 mb-4 flex-wrap">
+                    {empresaLogoUrl && !empresaLogoFile && (
+                      <img src={empresaLogoUrl} alt="Logo da empresa" className="h-20 w-20 object-contain rounded-lg border border-gray-300" />
+                    )}
+                    {empresaLogoFile && (
+                      <img src={URL.createObjectURL(empresaLogoFile)} alt="Nova logo" className="h-20 w-20 object-contain rounded-lg border border-gray-300" />
+                    )}
+                    <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-black px-4 py-2 rounded-lg transition-colors border border-gray-300 font-medium">
+                      Alterar Logo
+                      <input type="file" accept="image/*" className="hidden" onChange={handleEmpresaLogoChange} />
+                    </label>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">CNPJ</label>
-                  <IMaskInput
-                    mask="00.000.000/0000-00"
-                    value={empresaCnpj}
-                    onAccept={(value) => setEmpresaCnpj(String(value))}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
-                  <input 
-                    type="email" 
-                    value={empresaEmail} 
-                    onChange={e => setEmpresaEmail(e.target.value)} 
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                    required 
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
-                  <IMaskInput
-                    mask="(00) 00000-0000"
-                    value={empresaTelefone}
-                    onAccept={(value) => setEmpresaTelefone(String(value))}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="(00) 00000-0000"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Endereço</label>
-                  <input 
-                    type="text" 
-                    value={empresaEndereco} 
-                    onChange={e => setEmpresaEndereco(e.target.value)} 
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                    placeholder="Endereço completo"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp</label>
-                  <IMaskInput
-                    mask="(00) 00000-0000"
-                    value={empresaWhatsapp}
-                    onAccept={(value) => setEmpresaWhatsapp(String(value))}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="(00) 00000-0000"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Horário de Atendimento</label>
-                  <input 
-                    type="text" 
-                    value={empresaHorario} 
-                    onChange={e => setEmpresaHorario(e.target.value)} 
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                    placeholder="Ex: Segunda a Sexta, 08:00 às 18:00"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Sobre a Empresa</label>
-                  <textarea 
-                    value={empresaSobre} 
-                    onChange={e => setEmpresaSobre(e.target.value)} 
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                    rows={3}
-                    placeholder="Fale um pouco sobre sua empresa..."
-                  />
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <button 
-                  type="button" 
-                  onClick={() => setMostrarExtras(!mostrarExtras)}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium mb-2 flex items-center"
-                >
-                  {mostrarExtras ? 'Ocultar' : 'Mostrar'} usuários adicionais
-                  <svg 
-                    className={`ml-1 w-4 h-4 transition-transform ${mostrarExtras ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24" 
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M19 9l-7 7-7-7" 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">Nome da Empresa</label>
+                    <input 
+                      type="text" 
+                      value={empresaNome} 
+                      onChange={e => setEmpresaNome(e.target.value)} 
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black placeholder-black" 
+                      required 
+                      placeholder="Nome da empresa"
                     />
-                  </svg>
-                </button>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">CNPJ</label>
+                    <IMaskInput
+                      mask="00.000.000/0000-00"
+                      value={empresaCnpj}
+                      onAccept={(value) => setEmpresaCnpj(String(value))}
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black placeholder-black"
+                      placeholder="00.000.000/0000-00"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">E-mail</label>
+                    <input 
+                      type="email" 
+                      value={empresaEmail} 
+                      onChange={e => setEmpresaEmail(e.target.value)} 
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black placeholder-black" 
+                      required 
+                      placeholder="E-mail"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">Telefone</label>
+                    <IMaskInput
+                      mask="(00) 00000-0000"
+                      value={empresaTelefone}
+                      onAccept={(value) => setEmpresaTelefone(String(value))}
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black placeholder-black"
+                      placeholder="(00) 00000-0000"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-black mb-1">Endereço</label>
+                    <input 
+                      type="text" 
+                      value={empresaEndereco} 
+                      onChange={e => setEmpresaEndereco(e.target.value)} 
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black placeholder-black" 
+                      placeholder="Endereço completo"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-black mb-1">WhatsApp</label>
+                    <IMaskInput
+                      mask="(00) 00000-0000"
+                      value={empresaWhatsapp}
+                      onAccept={(value) => setEmpresaWhatsapp(String(value))}
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black placeholder-black"
+                      placeholder="(00) 00000-0000"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-black mb-1">Horário de Atendimento</label>
+                    <input 
+                      type="text" 
+                      value={empresaHorario} 
+                      onChange={e => setEmpresaHorario(e.target.value)} 
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black placeholder-black" 
+                      placeholder="Ex: Segunda a Sexta, 08:00 às 18:00"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-black mb-1">Sobre a Empresa</label>
+                    <textarea 
+                      value={empresaSobre} 
+                      onChange={e => setEmpresaSobre(e.target.value)} 
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black placeholder-black" 
+                      rows={3}
+                      placeholder="Fale um pouco sobre sua empresa..."
+                    />
+                  </div>
+                </div>
 
-                {mostrarExtras && (
-                  <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <h4 className="font-medium text-gray-700">Usuários Adicionais</h4>
-                    <div className="space-y-4">
-                      {[1, 2, 3].map((num) => (
-                        <div key={num} className="space-y-2">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Usuário {num}</label>
-                              <input
-                                type="text"
-                                value={eval(`usuarioExtra${num}`) || ''}
-                                onChange={(e) => eval(`setUsuarioExtra${num}(e.target.value)`)}
-                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                                placeholder={`E-mail do usuário ${num}`}
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                              <div className="relative">
+                <div className="mt-4">
+                  <button 
+                    type="button" 
+                    onClick={() => setMostrarExtras(!mostrarExtras)}
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium mb-2 flex items-center"
+                  >
+                    {mostrarExtras ? 'Ocultar' : 'Mostrar'} usuários adicionais
+                    <svg 
+                      className={`ml-1 w-4 h-4 transition-transform ${mostrarExtras ? 'rotate-180' : ''}`} 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24" 
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M19 9l-7 7-7-7" 
+                      />
+                    </svg>
+                  </button>
+
+                  {mostrarExtras && (
+                    <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <h4 className="font-medium text-gray-700">Usuários Adicionais</h4>
+                      <div className="space-y-4">
+                        {[1, 2, 3].map((num) => (
+                          <div key={num} className="space-y-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Usuário {num}</label>
                                 <input
-                                  type={eval(`mostrarSenhaExtra${num}`) ? 'text' : 'password'}
-                                  value={eval(`senhaExtra${num}`) || ''}
-                                  onChange={(e) => eval(`setSenhaExtra${num}(e.target.value)`)}
-                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm pr-10"
-                                  placeholder={`Senha do usuário ${num}`}
+                                  type="text"
+                                  value={eval(`usuarioExtra${num}`) || ''}
+                                  onChange={(e) => eval(`setUsuarioExtra${num}(e.target.value)`)}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                  placeholder={`E-mail do usuário ${num}`}
                                 />
-                                <button
-                                  type="button"
-                                  onClick={() => eval(`setMostrarSenhaExtra${num}(!mostrarSenhaExtra${num})`)}
-                                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
-                                >
-                                  {eval(`mostrarSenhaExtra${num}`) ? (
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                    </svg>
-                                  ) : (
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                  )}
-                                </button>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                                <div className="relative">
+                                  <input
+                                    type={eval(`mostrarSenhaExtra${num}`) ? 'text' : 'password'}
+                                    value={eval(`senhaExtra${num}`) || ''}
+                                    onChange={(e) => eval(`setSenhaExtra${num}(e.target.value)`)}
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm pr-10"
+                                    placeholder={`Senha do usuário ${num}`}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => eval(`setMostrarSenhaExtra${num}(!mostrarSenhaExtra${num})`)}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+                                  >
+                                    {eval(`mostrarSenhaExtra${num}`) ? (
+                                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                      </svg>
+                                    ) : (
+                                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                      </svg>
+                                    )}
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-
-              <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              {/* Sticky action bar for buttons */}
+              <div className="sticky bottom-0 left-0 right-0 bg-white px-4 py-4 border-t border-gray-200 z-10 flex flex-col sm:flex-row gap-3">
                 <button
                   type="button"
                   onClick={fecharModalEditarEmpresa}
@@ -633,7 +696,8 @@ export default function PainelEmpresa() {
           </div>
         </div>
       )}
-    </div>
-  </div>
-);
+        </div>
+      </div>
+    </>
+  );
 }

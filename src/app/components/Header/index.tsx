@@ -29,14 +29,17 @@ export default function Header({
     setSearchQuery(e.target.value);
   };
 
+  // Não renderiza o header em rotas de empresa pública (/empresa/[id])
+  if (/^\/empresa\/[\w-]+$/.test(pathname)) {
+    return null;
+  }
+
   return (
     <header className="w-full bg-white text-black shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-2 xs:px-3 sm:px-4 py-2 sm:py-3">
         <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
-
           {/* Logo e botão voltar */}
           <div className="flex items-center gap-2 xs:gap-3 sm:gap-4 w-full md:w-auto min-w-0">
-
             {showBackButton && !isHomePage && (
               <button
                 onClick={() => router.back()}
@@ -60,7 +63,6 @@ export default function Header({
               </span>
             )}
           </div>
-
           {/* Barra de busca */}
           {showSearchBar && isHomePage && (
             <div className="w-full max-w-full xs:max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl">
@@ -89,7 +91,6 @@ export default function Header({
               </form>
             </div>
           )}
-
           {/* Botão Área da Empresa */}
           <div className="w-full md:w-auto flex justify-end">
             <button

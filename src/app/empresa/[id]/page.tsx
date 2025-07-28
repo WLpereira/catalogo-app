@@ -1,13 +1,12 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useSearch } from '@/app/contexts/SearchContext';
 import { supabase } from "@/lib/supabaseClient";
 import Footer from '@/app/components/Footer';
 import { Empresa, Produto } from '@/types/empresa';
 
-
-   
 export default function EmpresaPage() {
   const params = useParams();
   const empresaId = params.id as string;
@@ -60,26 +59,44 @@ export default function EmpresaPage() {
     p.descricao?.toLowerCase().includes(busca.toLowerCase())
   );
 
+  const router = useRouter();
+
   return (
     <div className="min-h-screen flex flex-col" style={{ background: corPrimaria, minHeight: '100vh' }}>
+      {/* Navbar fixa topo */}
+      {empresa && (
+        <nav className="w-full fixed top-0 left-0 z-40 bg-white border-b border-gray-100 shadow-sm" style={{height:'64px'}}>
+          <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-8 h-16">
+            <div className="flex items-center gap-3">
+              <Link href="/" className="flex items-center">
+                {empresa.logo_url && (
+                  <img
+                    src={empresa.logo_url}
+                    alt={`Logo ${empresa.nome}`}
+                    className="h-10 w-10 sm:h-12 sm:w-12 object-contain rounded-full border border-gray-200 bg-white"
+                  />
+                )}
+              </Link>
+              <span className="text-lg sm:text-xl md:text-2xl font-bold" style={{color: corPrimaria}}>{empresa.nome}</span>
+            </div>
+            <button
+              onClick={() => router.push('/empresa/login')}
+              className="bg-black text-white px-4 py-2 rounded-lg font-bold text-sm sm:text-base shadow hover:bg-blue-700 transition-colors"
+            >
+              Área da Empresa
+            </button>
+          </div>
+        </nav>
+      )}
+      {/* Espaço para navbar fixa */}
+      <div style={{height:'64px'}}></div>
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: corPrimaria }}></div>
         </div>
       ) : empresa ? (
         <>
-          <header className="w-full bg-transparent flex flex-col items-center py-4 px-2 sm:px-4 lg:px-8">
-            <div className="flex flex-col sm:flex-row items-center gap-3 bg-white/80 rounded-xl shadow-lg px-4 py-3 max-w-xl w-full">
-              {empresa.logo_url && (
-                <img
-                  src={empresa.logo_url}
-                  alt={`Logo ${empresa.nome}`}
-                  className="h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 object-contain rounded-full border border-gray-200 shadow"
-                />
-              )}
-              <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-center w-full break-words" style={{ color: corPrimaria }}>{empresa.nome}</h1>
-            </div>
-          </header>
+          {/* Cabeçalho da empresa dinâmica (removido, pois agora está na navbar) */}
           {/* Banner responsivo */}
           {empresa.banner_urls && empresa.banner_urls.length > 0 && (
             <div className="w-full flex justify-center mt-4 px-1 sm:px-4">

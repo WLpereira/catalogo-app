@@ -620,29 +620,29 @@ export default function PainelEmpresa() {
 
                   {mostrarExtras && (
                     <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                      <h4 className="font-medium text-gray-700">Usuários Adicionais</h4>
+                      <h4 className="font-medium text-black">Usuários Adicionais</h4>
                       <div className="space-y-4">
                         {[1, 2, 3].map((num) => (
                           <div key={num} className="space-y-2">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Usuário {num}</label>
+                                <label className="block text-sm font-medium text-black mb-1">Usuário {num}</label>
                                 <input
                                   type="text"
                                   value={eval(`usuarioExtra${num}`) || ''}
                                   onChange={(e) => eval(`setUsuarioExtra${num}(e.target.value)`)}
-                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-black"
                                   placeholder={`E-mail do usuário ${num}`}
                                 />
                               </div>
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                                <label className="block text-sm font-medium text-black mb-1">Senha</label>
                                 <div className="relative">
                                   <input
                                     type={eval(`mostrarSenhaExtra${num}`) ? 'text' : 'password'}
                                     value={eval(`senhaExtra${num}`) || ''}
                                     onChange={(e) => eval(`setSenhaExtra${num}(e.target.value)`)}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm pr-10"
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm pr-10 text-black"
                                     placeholder={`Senha do usuário ${num}`}
                                   />
                                   <button

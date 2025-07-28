@@ -139,12 +139,13 @@ export default function ProdutoPage() {
           <div className="md:flex">
             {/* Imagem do produto */}
             <div className="md:flex-shrink-0 md:w-1/2 lg:w-2/5 p-6">
-              <div className="h-64 md:h-96 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+              <div className="h-64 md:h-96 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden group">
                 {produto.imagem_url ? (
                   <img 
                     src={produto.imagem_url} 
                     alt={produto.nome} 
-                    className="h-full w-full object-contain"
+                    className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-110"
+                    style={{ transition: 'transform 0.3s' }}
                   />
                 ) : (
                   <span className="text-gray-400">Sem imagem</span>
@@ -284,14 +285,16 @@ export default function ProdutoPage() {
                     // Passa as cores atuais na URL ao navegar para outro produto
                     router.push(`/produto/${produto.id}?corPrimaria=${encodeURIComponent(corPrimaria)}&corSecundaria=${encodeURIComponent(corSecundaria)}`);
                   }}
-                  className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                  className="bg-white rounded-lg shadow-sm overflow-hidden transition-shadow cursor-pointer group hover:shadow-lg hover:border hover:border-blue-200"
+                  style={{ transition: 'box-shadow 0.2s, border 0.2s' }}
                 >
-                  <div className="h-40 bg-gray-100 flex items-center justify-center p-4">
+                  <div className="h-40 bg-gray-100 flex items-center justify-center p-4 overflow-hidden">
                     {produto.imagem_url ? (
                       <img 
                         src={produto.imagem_url} 
                         alt={produto.nome}
-                        className="h-full w-full object-contain"
+                        className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-110"
+                        style={{ transition: 'transform 0.3s' }}
                       />
                     ) : (
                       <span className="text-gray-400">Sem imagem</span>
